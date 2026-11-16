@@ -1211,6 +1211,17 @@ window.WYNNYX_REGISTRY = {
     color:var(--accent-2);background:var(--glass-bg);border:1px solid rgba(var(--accent-rgb),.3);transition:opacity .4s}
   .d-fig .d3-hint svg{width:13px;height:13px;max-width:none}
   .d3-hint.gone{opacity:0}
+  .d-fig .d3-fs{position:absolute;top:6px;left:6px;z-index:3;width:40px;height:40px;padding:0;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+    color:var(--accent-2);background:var(--glass-bg);border:1px solid rgba(var(--accent-rgb),.3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .2s,transform .15s}
+  .d-fig .d3-fs:hover{background:rgba(var(--accent-rgb),.22)}
+  .d-fig .d3-fs:active{transform:scale(.94)}
+  .d-fig .d3-fs:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px}
+  .d-fig .d3-fs svg{width:18px;height:18px;max-width:none;max-height:none}
+  .d-fig.d3-full{position:fixed!important;left:0;top:0;right:0;bottom:0;width:100%!important;height:100vh!important;height:100dvh!important;max-height:none!important;min-height:0!important;z-index:2000;border-radius:0;
+    background:radial-gradient(ellipse at 50% 42%,rgba(var(--accent-rgb),.3),rgba(8,7,14,.98) 72%),#0a0912}
+  .d-fig.d3-full canvas.d3{min-height:0}
+  .d-fig.d3-full .d3-fs{top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left))}
+  .d-fig.d3-full .d3-hint{bottom:max(16px,env(safe-area-inset-bottom))}
   .d3-load{position:absolute;inset:0;display:grid;place-items:center;font-size:.78rem;color:var(--muted);pointer-events:none}
   .d-nav{position:absolute;top:50%;margin-top:-19px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;z-index:3;
     color:var(--text);background:color-mix(in srgb,var(--surface) 80%,transparent);border:1px solid var(--line);transition:border-color .2s,background-color .2s,color .2s}
@@ -4524,7 +4535,7 @@ window.WYNNYX_REGISTRY = {
              "float rim=pow(1.-max(N.z,0.),3.);" +
              "gl_FragColor=vec4(base*(amb+.5*d)+rimc*rim*.45,1.);}";
     function mount(host, url, name, embedId, poster){
-      var dead = false, raf = 0, ctl = {destroy: function(){ dead = true; cancelAnimationFrame(raf); if(cleanup) cleanup(); }}, cleanup = null;
+      var dead = false, raf = 0, ctl = {destroy: function(){ dead = true; cancelAnimationFrame(raf); if(cleanup) cleanup(); }}, cleanup = null, fsTeardownRef = null;
       var loading = document.createElement("div"); loading.className = "d3-load"; loading.textContent = "Loading 3D model…";
       host.classList.add("is3d"); host.appendChild(loading);
       /* the still photo stays up as the poster until the first 3D frame is on screen, and comes back if WebGL fails or the GPU context is lost */
@@ -4580,9 +4591,45 @@ window.WYNNYX_REGISTRY = {
         var ph = null;
         if(poster){ ph = new Image(); ph.className = "d3-poster"; ph.alt = ""; ph.src = imgUrl(poster); host.appendChild(ph); }
         host.appendChild(cv);
-        cv.addEventListener("webglcontextlost", function(ev){ ev.preventDefault(); if(dead) return; dead = true; cancelAnimationFrame(raf); showPoster(); });
+        cv.addEventListener("webglcontextlost", function(ev){ ev.preventDefault(); if(dead) return; dead = true; cancelAnimationFrame(raf); if(fsTeardownRef) fsTeardownRef(); showPoster(); });
         var hint = document.createElement("div"); hint.className = "d3-hint"; hint.innerHTML = ROT_ICON + "Drag to rotate 360°";
         host.appendChild(hint);
+        /* full-screen view of the model: real Fullscreen API where the browser allows it, otherwise a viewport-filling layer (iPhone Safari has no element full screen) */
+        var FS_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+        var FS_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+        var fsBtn = document.createElement("button"); fsBtn.type = "button"; fsBtn.className = "d3-fs";
+        var fsOn = false, realWas = false;
+        function fsReal(){ return (document.fullscreenElement || document.webkitFullscreenElement) === host; }
+        function fsLabel(t){ return (typeof UI !== "undefined" && UI && UI.t) ? UI.t(t) : t; }
+        function fsSync(){
+          fsBtn.innerHTML = fsOn ? FS_OFF : FS_ON;
+          var l = fsLabel(fsOn ? "Exit full screen" : "Full screen"); fsBtn.setAttribute("aria-label", l); fsBtn.title = l; fsBtn.setAttribute("aria-pressed", fsOn ? "true" : "false");
+          host.classList.toggle("d3-full", fsOn);
+        }
+        var fsPh = null;                                          /* the card is transformed, which would pin a fixed layer inside it: lift the frame to <body> while it fills the screen */
+        function fsLift(up){
+          if(up && !fsPh && host.parentNode){ fsPh = document.createComment("d3"); host.parentNode.insertBefore(fsPh, host); document.body.appendChild(host); }
+          else if(!up && fsPh){ if(fsPh.parentNode) fsPh.parentNode.insertBefore(host, fsPh); if(fsPh.parentNode) fsPh.parentNode.removeChild(fsPh); fsPh = null; }
+        }
+        function fsSet(on){
+          if(on === fsOn) return; fsOn = on;
+          if(on){
+            var req = host.requestFullscreen || host.webkitRequestFullscreen, lifted = false;
+            if(req){ try { var pr1 = req.call(host); if(pr1 && pr1.catch) pr1.catch(function(){ if(fsOn && !fsReal()) fsLift(true); }); } catch(e){ fsLift(true); lifted = true; } }
+            else { fsLift(true); lifted = true; }
+          } else {
+            if(fsReal()){ var ex = document.exitFullscreen || document.webkitExitFullscreen; try { var pr2 = ex.call(document); if(pr2 && pr2.catch) pr2.catch(function(){}); } catch(e){} }
+            fsLift(false);
+          }
+          fsSync();
+        }
+        function fsChange(){ var now = fsReal(); if(fsOn && realWas && !now){ fsOn = false; fsLift(false); fsSync(); } realWas = now; }    /* left real full screen with Esc / swipe / system button */
+        function fsKey(e){ if(fsOn && e.key === "Escape"){ e.stopPropagation(); e.preventDefault(); fsSet(false); } }      /* layer fallback: Esc leaves full screen before it can close the card */
+        function fsClick(e){ e.stopPropagation(); fsSet(!fsOn); }
+        fsSync(); fsBtn.addEventListener("click", fsClick); host.appendChild(fsBtn);
+        document.addEventListener("fullscreenchange", fsChange); document.addEventListener("webkitfullscreenchange", fsChange); window.addEventListener("keydown", fsKey, true);
+        function fsTeardown(){ document.removeEventListener("fullscreenchange", fsChange); document.removeEventListener("webkitfullscreenchange", fsChange); window.removeEventListener("keydown", fsKey, true); fsBtn.removeEventListener("click", fsClick); if(fsOn) fsSet(false); host.classList.remove("d3-full"); }
+        fsTeardownRef = fsTeardown;
 
         var yaw = -0.5, vel = 0, drag = false, lastX = 0, lastT = 0, idleAt = 0, DIST = 2.35, FOV = 28 * Math.PI / 180;
         var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -4620,6 +4667,7 @@ window.WYNNYX_REGISTRY = {
         }
         raf = requestAnimationFrame(frame);
         cleanup = function(){
+          if(fsTeardownRef) fsTeardownRef();
           cv.removeEventListener("pointerdown", down); cv.removeEventListener("pointermove", move);
           cv.removeEventListener("pointerup", up); cv.removeEventListener("pointercancel", up);
           var ext = gl.getExtension("WEBGL_lose_context"); if(ext) ext.loseContext();
