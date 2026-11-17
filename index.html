@@ -862,7 +862,7 @@ window.WYNNYX_REGISTRY = {
   .w-frame.yt-fresh .w-big{display:none}                                                   /* before the first play, YouTube's own start button is what the viewer taps (iPhone / iPad need that tap inside the player) */
   .w-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block;cursor:pointer}
   /* in-page subtitles: HTML layer over the picture, cinematic type on a soft dark glass pill */
-  .w-sub{position:absolute;left:0;right:0;bottom:3.5%;display:flex;justify-content:center;padding:0 4%;pointer-events:none;z-index:1;transition:bottom .22s ease,opacity .18s ease;opacity:0;text-align:center}
+  .w-sub{position:absolute;left:0;right:0;bottom:6%;display:flex;justify-content:center;padding:0 4%;pointer-events:none;z-index:1;transition:bottom .22s ease,opacity .18s ease;opacity:0;text-align:center}
   .w-sub.on{opacity:1}
   .w-sub span{display:inline-block;max-width:min(100%,46em);padding:.12em .7em .18em;border-radius:.4em;background:rgba(8,10,16,.4);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);
     color:#f6f2ea;font-family:var(--serif);font-weight:500;font-size:clamp(.72rem,2cqw,1.15rem);line-height:1.35;letter-spacing:.012em;
@@ -870,7 +870,7 @@ window.WYNNYX_REGISTRY = {
   .w-fs .w-sub span,.w-frame:fullscreen .w-sub span{font-size:clamp(.8rem,1.55cqw,1.4rem)}
   .w-sub[data-l="th"] span{font-family:var(--sans);font-weight:500;line-height:1.55;letter-spacing:0}
   .w-sub:not(.on) span{visibility:hidden}
-  .w-frame.ctl .w-sub{bottom:62px}
+  .w-frame.ctl .w-sub{bottom:70px}
   .w-big{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;width:68px;height:68px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(15,15,22,.58);
     -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;display:none;place-items:center;cursor:pointer;padding:0;transition:background .15s,transform .15s}
   .w-big svg{width:30px;height:30px;margin-left:3px}
@@ -912,8 +912,8 @@ window.WYNNYX_REGISTRY = {
   .w-fs .w-frame{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;margin:0;border:0;border-radius:0;z-index:2}
   .w-frame:fullscreen{width:100vw;max-width:none;height:100%;border:0;border-radius:0}
   .w-fs .w-box,.w-frame:fullscreen .w-box{height:100%}
-  .w-fs .w-frame.ctl .w-sub,.w-frame:fullscreen.ctl .w-sub{bottom:80px}
-  .w-fs .w-sub,.w-frame:fullscreen .w-sub{bottom:3.5%}
+  .w-fs .w-frame.ctl .w-sub,.w-frame:fullscreen.ctl .w-sub{bottom:90px}
+  .w-fs .w-sub,.w-frame:fullscreen .w-sub{bottom:6%}
   .w-ov{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .25s}
   .w-ov.show{opacity:1}
   .w-ov>*{pointer-events:none}
