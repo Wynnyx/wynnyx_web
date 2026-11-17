@@ -651,6 +651,18 @@ window.WYNNYX_REGISTRY = {
     #view-reader:not([data-rmode="scroll"]) .stage{padding-top:4px;padding-bottom:2px}
   }
 
+  /* phone turned sideways (16:9 and wider): the two-page book gets a smaller type size and tighter lines so a page holds a real paragraph or two */
+  @media (max-height:520px) and (min-aspect-ratio:3/2){
+    #view-reader.spread #story.paged{font-size:calc(14.5px * var(--scale));line-height:1.5;orphans:2;widows:1}
+    #view-reader.spread #story.paged p{margin-bottom:.55em}
+    #view-reader.spread #story.paged .ch-head h1{font-size:1.15em}
+    #view-reader[data-rmode="book"].spread .rbook.compact{padding:24px 22px 24px}
+    #view-reader.spread .rbook.compact .run{top:6px;font-size:.58rem}
+    #view-reader.fs.spread .fs-back{display:none}                                  /* the ✕ is enough in landscape; the title would sit on the chapter label */
+    #view-reader.spread .rbook.compact .pn{bottom:5px;font-size:.6rem}
+    #view-reader.spread .rbook.compact .run-l,#view-reader.spread .rbook.compact .pn-l{left:22px}
+    #view-reader.spread .rbook.compact .run-r,#view-reader.spread .rbook.compact .pn-r{right:22px}
+  }
   /* ---------- Distraction-free full screen ---------- */
   .fs-bar,.fs-ind{display:none}
   body.fs{overflow:hidden}
@@ -1814,7 +1826,7 @@ window.WYNNYX_REGISTRY = {
       <span class="pn pn-l" id="pnL"></span><span class="pn pn-r" id="pnR"></span>
       <div class="turn-fx" id="fx"></div>
       <div class="orient-hint" id="orientHint" hidden>
-        <span>1-page view &middot; full spread on PC &amp; tablet</span>
+        <span>1-page view &middot; turn your phone or tablet sideways for the two-page spread</span>
         <button type="button" id="orientClose" aria-label="Dismiss tip">&times;</button>
       </div>
     </div>
@@ -3786,7 +3798,10 @@ window.WYNNYX_REGISTRY = {
     catch(e){ return window.innerWidth > window.innerHeight; }
   }
   /* full 2-page spread only on PC / laptop / full-size tablet; everything smaller gets the 1-page paper book */
-  function twoUpOK(){ return window.innerWidth >= 900 && window.innerHeight >= 550; }
+  function twoUpOK(){
+    var w = window.innerWidth, h = window.innerHeight;
+    return (w >= 900 && h >= 550) || (w >= 640 && h >= 300 && w >= h * 1.45);       /* big screens, or any phone / tablet turned sideways (16:9 and wider) */
+  }
   var softT = 0;
   function softPaginate(){            /* fade out, re-flow, fade back in */
     if(rmode === "scroll" || currentView !== "reader"){ schedulePaginate(); return; }
@@ -3829,7 +3844,7 @@ window.WYNNYX_REGISTRY = {
     $("view-reader").classList.toggle("spread", rmode === "book" && !oneUp);
     $("orientHint").hidden = !showHint;
     var oh = $("orientHint").firstElementChild;
-    if(oh) oh.textContent = window.innerWidth >= 700 ? "1-page view \u00b7 turn your tablet sideways for the two-page spread" : "1-page view \u00b7 full spread on PC & tablet";
+    if(oh) oh.textContent = "1-page view \u00b7 turn your phone or tablet sideways for the two-page spread";
     story.classList.add("paged", "nofx");
     story.style.transform = "none";
     story.style.width = story.style.height = vp.style.width = vp.style.height = "";
@@ -4971,6 +4986,7 @@ window.WYNNYX_REGISTRY = {
       "Reading mode":"โหมดการอ่าน", "Reading progress":"ความคืบหน้าการอ่าน", "Full-screen reading":"อ่านแบบเต็มจอ", "Exit full screen":"ออกจากโหมดเต็มจอ",
       "Word Assist is on. Tap any":"ตัวช่วยคำศัพท์เปิดอยู่ แตะ", "for its meaning, pronunciation and translation.":"เพื่อดูความหมาย การออกเสียง และคำแปล",
       "1-page view · full spread on PC & tablet":"มุมมองหน้าเดียว · แสดงสองหน้าเต็มบนพีซีและแท็บเล็ต",
+      "1-page view · turn your phone or tablet sideways for the two-page spread":"มุมมองหน้าเดียว · หมุนโทรศัพท์หรือแท็บเล็ตแนวนอนเพื่อดูสองหน้า",
       "1-page view · turn your tablet sideways for the two-page spread":"มุมมองหน้าเดียว · หมุนแท็บเล็ตแนวนอนเพื่อดูสองหน้า",
       "Dismiss tip":"ปิดคำแนะนำ", "← Prev":"← ก่อนหน้า", "Next →":"ถัดไป →", "← Previous Page":"← หน้าก่อนหน้า", "Next Page →":"หน้าถัดไป →",
       "Translate to":"แปลเป็น", "Translation language":"ภาษาที่ใช้แปล", "Translation coming soon":"คำแปลจะมาเร็วๆ นี้", "Speech isn't supported in this browser.":"เบราว์เซอร์นี้ไม่รองรับการอ่านออกเสียง",
