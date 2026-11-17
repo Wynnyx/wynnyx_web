@@ -679,6 +679,8 @@ window.WYNNYX_REGISTRY = {
   #story.tight .illo{margin:.55em auto .65em}
   html.no-ill .illo{display:none}
   html.ill-fade .illo{opacity:0}
+  .ill-modal{max-width:440px}
+  .ill-modal h2{margin:0 0 10px;font-size:1.25rem}
   #illBtn .ill-slash{display:none}
   #illBtn[aria-pressed="false"] .ill-slash{display:block}
   #illBtn[aria-pressed="false"]{color:var(--muted)}
@@ -1482,6 +1484,17 @@ window.WYNNYX_REGISTRY = {
     <div class="tr-actions">
       <button type="button" class="tr-cancel" id="trCancel">Cancel</button>
       <button type="button" class="btn-primary" id="trOk">Continue</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="illScrim" aria-hidden="true">
+  <div class="modal ill-modal" id="illModal" role="dialog" aria-modal="true" aria-labelledby="illTitle" aria-describedby="illNote">
+    <h2 id="illTitle">Read with illustrations?</h2>
+    <p class="tr-note" id="illNote">Pencil drawings appear between the paragraphs of some chapters. You can switch them on or off at any time with the picture button in the toolbar.</p>
+    <div class="tr-actions">
+      <button type="button" class="tr-cancel" id="illNo">Without illustrations</button>
+      <button type="button" class="btn-primary" id="illYes">With illustrations</button>
     </div>
   </div>
 </div>
@@ -2531,7 +2544,7 @@ window.WYNNYX_REGISTRY = {
     document.body.classList.toggle("paged", name === "reader" && rmode !== "scroll");
     setHdr();
     if(changed) window.scrollTo(0, 0);
-    if(name === "reader") schedulePaginate();
+    if(name === "reader"){ schedulePaginate(); setTimeout(illAsk, 250); }
     updateProgress();
     updateTitle();
   }
@@ -3660,9 +3673,28 @@ window.WYNNYX_REGISTRY = {
     document.documentElement.classList.toggle("no-ill", !illOn);
     b.setAttribute("aria-pressed", illOn ? "true" : "false"); b.setAttribute("aria-label", t); b.title = t;
   }
+  var ILL_ASK_KEY = "wynnyx.illustrations.asked.v1", illOpen = false, illLast = null;
+  var illAsked = load(ILL_ASK_KEY, false) === true || (function(){ try { return localStorage.getItem(ILL_KEY) !== null; } catch(e){ return false; } })();   /* anyone who already switched them keeps that choice */
+  function illAsk(){                                                    /* once, before the first chapter that has drawings */
+    if(illAsked || illOpen || !curChap || !illData()[curChap]) return;
+    illOpen = true; illLast = document.activeElement;
+    var sc = $("illScrim"); sc.classList.add("open"); sc.setAttribute("aria-hidden", "false"); $("illYes").focus();
+  }
+  function illChoose(on){
+    if(!illOpen) return;
+    illOpen = false; illAsked = true; illOn = !!on;
+    save(ILL_KEY, illOn); save(ILL_ASK_KEY, true);
+    var sc = $("illScrim"); sc.classList.remove("open"); sc.setAttribute("aria-hidden", "true");
+    illApply();
+    if(currentView === "reader") reflowKeepingPlace(false);
+    if(illLast && illLast.focus) try { illLast.focus(); } catch(e){}
+  }
+  $("illYes").addEventListener("click", function(){ illChoose(true); });
+  $("illNo").addEventListener("click", function(){ illChoose(false); });
   var illT = 0;
   $("illBtn").addEventListener("click", function(){
     illOn = !illOn;
+    if(!illAsked){ illAsked = true; save(ILL_ASK_KEY, true); }
     try { localStorage.setItem(ILL_KEY, JSON.stringify(illOn)); } catch(e){}
     var root = document.documentElement; clearTimeout(illT);
     if(currentView !== "reader" || !story.querySelector(".illo")){ illApply(); return; }
@@ -4161,7 +4193,7 @@ window.WYNNYX_REGISTRY = {
     var n = P.idx + dir;
     if(n < 0 || n >= P.views){ if(chapter) chapterStep(dir); return; }
     lastTurnAt = Date.now();
-    pageSound(dir);
+    if(rmode === "book") pageSound(dir);                                  /* the page-flip sound belongs to the open book only */
     gpuHint();
     closeCard();
     var from = P.idx;
@@ -4558,7 +4590,8 @@ window.WYNNYX_REGISTRY = {
   });
   document.addEventListener("keydown", function(e){
     if(e.key === "Escape"){
-      if(charOpen) closeChar();
+      if(illOpen) illChoose(illOn);
+      else if(charOpen) closeChar();
       else if(W.open){ W.fs ? wFull(false) : closeWatch(); }
       else if(trOpen) closeTr();
       else if(chOpen) closeChMenu();
