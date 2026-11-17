@@ -1211,6 +1211,10 @@ window.WYNNYX_REGISTRY = {
     color:var(--accent-2);background:var(--glass-bg);border:1px solid rgba(var(--accent-rgb),.3);transition:opacity .4s}
   .d-fig .d3-hint svg{width:13px;height:13px;max-width:none}
   .d3-hint.gone{opacity:0}
+  .d-fig.is3d>img,.d-fig.is3d>svg{opacity:0}   /* the flat art that loads first would show as a lighter box around the model; it stays hidden while the 3D loads and only shows if the 3D fails */
+  .d-fig canvas.d3{animation:d3in .45s ease both}
+  @keyframes d3in{from{opacity:0}to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.d-fig canvas.d3{animation:none}}
   .d-fig .d3-fs{position:absolute;top:6px;left:6px;z-index:3;width:40px;height:40px;padding:0;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
     color:var(--accent-2);background:var(--glass-bg);border:1px solid rgba(var(--accent-rgb),.3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .2s,transform .15s}
   .d-fig .d3-fs:hover{background:rgba(var(--accent-rgb),.22)}
@@ -4535,9 +4539,11 @@ window.WYNNYX_REGISTRY = {
              "float rim=pow(1.-max(N.z,0.),3.);" +
              "gl_FragColor=vec4(base*(amb+.5*d)+rimc*rim*.45,1.);}";
     function mount(host, url, name, embedId, poster){
-      var dead = false, raf = 0, ctl = {destroy: function(){ dead = true; cancelAnimationFrame(raf); if(cleanup) cleanup(); }}, cleanup = null, fsTeardownRef = null;
+      var dead = false, raf = 0, ctl = {destroy: function(){ dead = true; clearInterval(keepLoad); cancelAnimationFrame(raf); if(cleanup) cleanup(); }}, cleanup = null, fsTeardownRef = null;
       var loading = document.createElement("div"); loading.className = "d3-load"; loading.textContent = "Loading 3D model…";
       host.classList.add("is3d"); host.appendChild(loading);
+      /* the flat art that loadImg puts in the frame wipes the label when it lands, so keep re-attaching it until the 3D is up */
+      var keepLoad = setInterval(function(){ if(dead || host.querySelector("canvas.d3")) return; if(!loading.parentNode || loading.parentNode !== host) host.appendChild(loading); }, 200);
       /* the still photo stays up as the poster until the first 3D frame is on screen, and comes back if WebGL fails or the GPU context is lost */
       function showPoster(){
         host.innerHTML = ""; host.classList.remove("is3d");
@@ -4546,6 +4552,7 @@ window.WYNNYX_REGISTRY = {
         host.classList.add("portrait"); host.appendChild(im);
       }
       load(url, embedId).then(function(m){
+        clearInterval(keepLoad);
         if(dead) return;
         var cv = document.createElement("canvas"); cv.className = "d3"; cv.tabIndex = -1;
         cv.setAttribute("role", "img"); cv.setAttribute("aria-label", "Interactive 3D model of " + name + ". Drag left or right to rotate.");
@@ -4589,7 +4596,7 @@ window.WYNNYX_REGISTRY = {
         host.innerHTML = ""; host._tok = (host._tok || 0) + 1;
         host.classList.remove("portrait");
         var ph = null;
-        if(poster){ ph = new Image(); ph.className = "d3-poster"; ph.alt = ""; ph.src = imgUrl(poster); host.appendChild(ph); }
+        /* no still-photo placeholder here: its square photo background showed as a lighter box around the model for the first second or two. The "Loading 3D model…" label covers the wait, and the canvas fades in. */
         host.appendChild(cv);
         cv.addEventListener("webglcontextlost", function(ev){ ev.preventDefault(); if(dead) return; dead = true; cancelAnimationFrame(raf); if(fsTeardownRef) fsTeardownRef(); showPoster(); });
         var hint = document.createElement("div"); hint.className = "d3-hint"; hint.innerHTML = ROT_ICON + "Drag to rotate 360°";
@@ -4673,6 +4680,7 @@ window.WYNNYX_REGISTRY = {
           var ext = gl.getExtension("WEBGL_lose_context"); if(ext) ext.loseContext();
         };
       }).catch(function(e){
+        clearInterval(keepLoad);
         if(dead) return;
         if(window.console) console.warn("3D model unavailable, showing photo:", e && e.message);
         if(loading.parentNode) loading.parentNode.removeChild(loading);
