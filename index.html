@@ -564,6 +564,17 @@ window.WYNNYX_REGISTRY = {
   .rbook.one .run-l,.rbook.one .pn-l{display:none}
   .rbook.one .run-r{right:auto;left:42px;text-align:left}
   .rbook.one .pn-r{right:32px}
+  /* ---------- 3D paper page turn (leaf hinged on the spine; see leafTurn) ---------- */
+  .fx3d{position:absolute;inset:0;z-index:8;pointer-events:none;perspective:4200px;perspective-origin:50% 50%}
+  .fx3d .rb-clone{position:absolute!important;left:0;top:0;margin:0!important;max-width:none!important;box-shadow:none!important;background:none!important;border-color:transparent!important;border-radius:0!important;transform:none!important;overflow:visible!important}
+  .fx3d .rb-clone::before,.fx3d .rb-clone::after{display:none!important}
+  .fx3d .rb-half{position:absolute;top:0;overflow:hidden}
+  .fx3d .lf{position:absolute;top:0;transform-origin:0 50%;transform-style:preserve-3d;will-change:transform}
+  .fx3d .lf-f{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .fx3d .lf-b{transform:rotateY(180deg)}
+  .fx3d .lf-dk{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(20,12,6,.55),rgba(20,12,6,.2));opacity:0}
+  .fx3d .lf-sh{position:absolute;top:0;pointer-events:none;opacity:0}
+  @media (prefers-reduced-motion:reduce){.fx3d{display:none}}
   .turn-fx{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;border-radius:inherit;
     background:linear-gradient(90deg,transparent,rgba(30,20,10,.3),transparent) no-repeat;background-size:34% 100%}
   .turn-fx.go-next{animation:fxNext .5s ease}
@@ -3792,6 +3803,7 @@ window.WYNNYX_REGISTRY = {
   }
   var MOBILE_V = window.matchMedia("(max-width:720px), (max-height:520px)");
   function paginate(){
+    leafEnd();
     if(currentView !== "reader") return;
     if(rmode === "scroll"){
       story.classList.remove("paged","fadeout");
@@ -3945,6 +3957,100 @@ window.WYNNYX_REGISTRY = {
   $("sndReset").addEventListener("click", function(){ sndPct = 100; save(SND_VOL_KEY, 100); sndShow(); pageSound(1); });
   document.addEventListener("click", function(e){ if(sndPop.classList.contains("open") && !sndPop.contains(e.target) && !sndBtn.contains(e.target)) closeSnd(); });
   sndShow();
+  /* ---- 3D paper page turn --------------------------------------------------------------------------------
+     The text stays laid out in CSS columns (so reading position, saved progress, Word Assist and swipes are untouched).
+     For each turn we snapshot the book (cloneNode) before and after the page change, then play a leaf that hinges on the
+     spine: its front is the old right page, its back the new left page. When it lands it is pixel-identical to the live
+     book underneath, and the overlay is removed. Any failure falls back to the old slide. */
+  var leafS = null;
+  function leafEnd(){
+    var o = leafS; if(!o) return; leafS = null; clearTimeout(o.t);
+    o.anims.forEach(function(a){ try { a.cancel(); } catch(e){} });
+    if(o.el.parentNode) o.el.parentNode.removeChild(o.el);
+  }
+  function leafOK(){
+    return rmode === "book" && currentView === "reader" && !!rbook.animate && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) && rbook.offsetWidth > 120 && rbook.offsetHeight > 120;
+  }
+  var CREASE_R = "linear-gradient(90deg,rgba(30,18,8,.55) 0,rgba(50,32,14,.34) 3px,rgba(70,48,24,.10) 27px,transparent 48px)";
+  var CREASE_L = "linear-gradient(270deg,rgba(30,18,8,.55) 0,rgba(50,32,14,.34) 3px,rgba(70,48,24,.10) 27px,transparent 48px)";
+  function leafPaper(side, spread){
+    var cs = getComputedStyle(rbook), base = cs.backgroundColor;
+    if(!base || base === "rgba(0, 0, 0, 0)" || base === "transparent") base = (rmode === "flip") ? "var(--surface)" : "var(--paper)";
+    if(rmode !== "book") return base;
+    if(spread) return side === "r" ? CREASE_R + ",linear-gradient(90deg,transparent 92%,rgba(0,0,0,.07))," + base : CREASE_L + ",linear-gradient(90deg,rgba(0,0,0,.07),transparent 8%)," + base;
+    return "linear-gradient(90deg,rgba(30,18,8,.5),rgba(50,32,14,.2) 22px,transparent 44px)," + base;
+  }
+  /* a clipped snapshot of the book showing page-view idx: side "l" / "r" = left / right half, "a" = the whole page */
+  function leafSnap(idx, side, W, H, bg){
+    var cs = getComputedStyle(rbook), c = rbook.cloneNode(true), box = cs.boxSizing === "border-box";
+    c.classList.add("rb-clone");
+    [].forEach.call(c.querySelectorAll(".turn-fx,.orient-hint,.fx3d"), function(n){ n.parentNode.removeChild(n); });
+    [].forEach.call(c.querySelectorAll("[tabindex]"), function(n){ n.removeAttribute("tabindex"); });
+    var st = c.querySelector(".paged");
+    if(st){ st.classList.add("nofx"); st.style.transition = "none"; st.style.transform = "translateX(" + (-idx * P.step) + "px)"; }
+    var cw = box ? W : W - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
+    var ch = box ? H : H - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - parseFloat(cs.borderTopWidth) - parseFloat(cs.borderBottomWidth);
+    c.style.width = cw + "px"; c.style.height = ch + "px";
+    var half = document.createElement("div"); half.className = "rb-half";
+    var hw = side === "a" ? W : W / 2;
+    half.style.width = hw + "px"; half.style.height = H + "px"; half.style.background = bg;
+    c.style.left = (side === "r" ? -W / 2 : 0) + "px";
+    half.appendChild(c);
+    return half;
+  }
+  function leafTurn(dir, oldIdx, newIdx){
+    leafEnd();
+    var W = rbook.offsetWidth, H = rbook.offsetHeight, spread = P.per === 2, hw = spread ? W / 2 : W;
+    var ov = document.createElement("div"); ov.className = "fx3d"; ov.setAttribute("aria-hidden", "true"); ov.inert = true;
+    var oldL, oldR, newL, newR, oldA, newA;
+    var bgL = leafPaper("l", spread), bgR = leafPaper("r", spread);
+    /* snapshots of the OLD book must be taken before the live book moves */
+    if(spread){ oldL = leafSnap(oldIdx, "l", W, H, bgL); oldR = leafSnap(oldIdx, "r", W, H, bgR); }
+    else { oldA = leafSnap(oldIdx, "a", W, H, bgR); }
+    P.idx = newIdx; applyPage(false);
+    if(spread){ newL = leafSnap(newIdx, "l", W, H, bgL); newR = leafSnap(newIdx, "r", W, H, bgR); }
+    else { newA = leafSnap(newIdx, "a", W, H, bgR); }
+    var lf = document.createElement("div"), ff = document.createElement("div"), fb = document.createElement("div"), dkF = document.createElement("div"), dkB = document.createElement("div");
+    lf.className = "lf"; ff.className = "lf-f"; fb.className = "lf-b lf-f"; dkF.className = "lf-dk"; dkB.className = "lf-dk";
+    lf.style.left = (spread ? hw : 0) + "px"; lf.style.width = hw + "px"; lf.style.height = H + "px";
+    var cover = null, front, back, anims = [], D = spread ? 900 : 560, EASE = "cubic-bezier(.45,.05,.25,1)";
+    if(spread){
+      if(dir > 0){ cover = oldL; cover.style.left = "0px"; front = oldR; back = newL; }        /* next: old right page lifts, lands as the new left page */
+      else { cover = oldR; cover.style.left = hw + "px"; front = newR; back = oldL; }         /* previous: old left page swings back over to the right */
+      front.style.left = "0px"; back.style.left = "0px";
+      ff.appendChild(front); ff.appendChild(dkF); fb.appendChild(back); fb.appendChild(dkB);
+      lf.appendChild(ff); lf.appendChild(fb);
+      var shR = document.createElement("div"), shL = document.createElement("div");
+      shR.className = "lf-sh"; shR.style.cssText = "left:" + hw + "px;width:" + hw * 0.55 + "px;height:" + H + "px;background:linear-gradient(90deg,rgba(15,8,2,.42),transparent)";
+      shL.className = "lf-sh"; shL.style.cssText = "left:" + hw * 0.45 + "px;width:" + hw * 0.55 + "px;height:" + H + "px;background:linear-gradient(270deg,rgba(15,8,2,.42),transparent)";
+      ov.appendChild(cover); ov.appendChild(shR); ov.appendChild(shL); ov.appendChild(lf);
+      var fwd = dir > 0, rot = fwd ? ["rotateY(0deg)", "rotateY(-180deg)"] : ["rotateY(-180deg)", "rotateY(0deg)"];
+      anims.push(lf.animate([{ transform: rot[0] }, { transform: rot[1] }], { duration: D, easing: EASE, fill: "forwards" }));
+      var dkIn = fwd ? [{ opacity: 0 }, { opacity: .55, offset: .5 }, { opacity: .55 }] : [{ opacity: .55 }, { opacity: .55, offset: .5 }, { opacity: 0 }];
+      var dkOut = fwd ? [{ opacity: .55 }, { opacity: .55, offset: .5 }, { opacity: 0 }] : [{ opacity: 0 }, { opacity: .55, offset: .5 }, { opacity: .55 }];
+      anims.push(dkF.animate(dkIn, { duration: D, easing: "linear", fill: "forwards" }));
+      anims.push(dkB.animate(dkOut, { duration: D, easing: "linear", fill: "forwards" }));
+      /* the leaf throws a soft shadow on the page it uncovers, and the page it lands on darkens near the spine */
+      var up = fwd ? [{ opacity: .9 }, { opacity: .5, offset: .5 }, { opacity: 0 }] : [{ opacity: 0 }, { opacity: .5, offset: .5 }, { opacity: .9 }];
+      var land = fwd ? [{ opacity: 0 }, { opacity: 0, offset: .45 }, { opacity: .85, offset: .8 }, { opacity: 0 }] : [{ opacity: 0 }, { opacity: .85, offset: .2 }, { opacity: 0, offset: .55 }, { opacity: 0 }];
+      anims.push(shR.animate(fwd ? up : [{ opacity: 0 }, { opacity: .6, offset: .5 }, { opacity: 0 }], { duration: D, easing: "linear", fill: "forwards" }));
+      anims.push(shL.animate(land, { duration: D, easing: "linear", fill: "forwards" }));
+    } else {
+      front = dir > 0 ? oldA : newA; front.style.left = "0px";
+      var blank = document.createElement("div"); blank.className = "rb-half"; blank.style.cssText = "left:0;width:" + W + "px;height:" + H + "px;background:" + bgR;
+      ff.appendChild(front); ff.appendChild(dkF); fb.appendChild(blank);
+      lf.appendChild(ff); lf.appendChild(fb);
+      if(dir < 0){ cover = oldA; cover.style.left = "0px"; ov.appendChild(cover); }
+      ov.appendChild(lf);
+      var kf = dir > 0 ? [{ transform: "rotateY(0deg)", opacity: 1 }, { transform: "rotateY(-62deg)", opacity: 1, offset: .55 }, { transform: "rotateY(-100deg)", opacity: 0 }]
+                       : [{ transform: "rotateY(-100deg)", opacity: 0 }, { transform: "rotateY(-62deg)", opacity: 1, offset: .45 }, { transform: "rotateY(0deg)", opacity: 1 }];
+      anims.push(lf.animate(kf, { duration: D, easing: dir > 0 ? "cubic-bezier(.4,.1,.7,1)" : "cubic-bezier(.3,0,.6,.9)", fill: "forwards" }));
+      anims.push(dkF.animate(dir > 0 ? [{ opacity: 0 }, { opacity: .5 }] : [{ opacity: .5 }, { opacity: 0 }], { duration: D, easing: "linear", fill: "forwards" }));
+    }
+    rbook.appendChild(ov);
+    leafS = { el: ov, anims: anims, t: setTimeout(leafEnd, D + 80) };
+    anims[0].onfinish = function(){ if(leafS && leafS.el === ov) leafEnd(); };
+  }
   function turn(dir, chapter){
     if(rmode === "scroll") return;
     var n = P.idx + dir;
@@ -3953,6 +4059,10 @@ window.WYNNYX_REGISTRY = {
     pageSound(dir);
     gpuHint();
     closeCard();
+    var from = P.idx;
+    if(leafOK()){
+      try { leafTurn(dir, from, n); return; } catch(err){ leafEnd(); if(window.console) console.warn("page-turn effect skipped", err); }
+    }
     P.idx = n;
     var fx = $("fx");
     fx.classList.remove("go-next","go-prev"); void fx.offsetWidth;
