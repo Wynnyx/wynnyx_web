@@ -148,6 +148,23 @@ window.WYNNYX_REGISTRY = {
   .circ:hover,.circ[aria-expanded="true"]{background:var(--accent-soft);box-shadow:0 0 16px var(--glow)}
   .circ svg{width:18px;height:18px}
   .circ.q{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1}
+  /* full-screen button inside the 1-page card (top-right corner), and the first-visits "tap for full screen" tip in book mode */
+  .card-fs{display:none;position:absolute;top:10px;right:10px;z-index:3;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;
+    color:var(--accent);background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.4);transition:box-shadow .2s,background .2s}
+  .card-fs:hover{background:var(--accent-soft);box-shadow:0 0 14px var(--glow)}
+  .card-fs svg{width:16px;height:16px}
+  #view-reader[data-rmode="flip"] .card-fs{display:inline-flex}
+  #view-reader[data-rmode="flip"] #fsBtn{display:none}
+  #view-reader.fs .card-fs{display:none!important}
+  @keyframes fsGlow{0%,100%{box-shadow:0 0 0 0 rgba(var(--accent-rgb),.55),0 0 6px rgba(var(--accent-rgb),.3)}50%{box-shadow:0 0 0 7px rgba(var(--accent-rgb),0),0 0 20px rgba(var(--accent-rgb),.85)}}
+  .circ.glow{animation:fsGlow 1.5s ease-in-out infinite;background:var(--accent-soft)}
+  .fs-tip{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translate(-50%,10px);z-index:60;width:max-content;max-width:min(88vw,380px);
+    display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:999px;font-family:var(--sans);font-size:13.5px;line-height:1.35;color:var(--text);
+    background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid rgba(var(--accent-rgb),.55);box-shadow:0 10px 30px var(--shadow),0 0 22px rgba(var(--accent-rgb),.25);
+    opacity:0;pointer-events:none;transition:opacity .35s,transform .35s}
+  .fs-tip.show{opacity:1;transform:translate(-50%,0)}
+  .fs-tip svg{width:17px;height:17px;flex:none;color:var(--accent)}
+  body.fs .fs-tip{display:none}
 
   .saved-btn{
     position:relative;display:inline-flex;align-items:center;gap:7px;
@@ -1908,6 +1925,7 @@ window.WYNNYX_REGISTRY = {
   </div>
 </div>
 
+<div class="fs-tip" id="fsTip" role="status" aria-live="polite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Tap the middle of the page for full screen</span></div>
 <div class="read-dock" id="readDock" role="group" aria-label="Reading controls"></div>
 
 <!-- ================= READER VIEW ================= -->
@@ -1947,6 +1965,9 @@ window.WYNNYX_REGISTRY = {
   <p class="hint" id="hint">Word Assist is on. Tap any <b>underlined word</b> for its meaning, pronunciation and translation.</p>
   <div class="stage" id="stage">
     <div class="rbook" id="rbook">
+      <button type="button" class="card-fs" id="cardFs" aria-label="Full-screen reading" title="Full-screen reading">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
       <span class="run run-l" id="runL"></span><span class="run run-r" id="runR"></span>
       <div class="vp" id="vp"><article id="story" lang="en"></article></div>
       <span class="pn pn-l" id="pnL"></span><span class="pn pn-r" id="pnR"></span>
@@ -2639,7 +2660,7 @@ window.WYNNYX_REGISTRY = {
     document.body.classList.toggle("paged", name === "reader" && rmode !== "scroll");
     setHdr();
     if(changed) window.scrollTo(0, 0);
-    if(name === "reader"){ schedulePaginate(); setTimeout(function(){ if(!styleAsk()) illAsk(); }, 250); }
+    if(name === "reader"){ schedulePaginate(); setTimeout(function(){ if(!styleAsk()) illAsk(); }, 250); setTimeout(fsHintMaybe, 1400); }
     updateProgress();
     updateTitle();
   }
@@ -3806,6 +3827,7 @@ window.WYNNYX_REGISTRY = {
     illApply();
     if(currentView === "reader") reflowKeepingPlace(false);
     if(illLast && illLast.focus) try { illLast.focus(); } catch(e){}
+    setTimeout(fsHintMaybe, 700);
   }
   $("illYes").addEventListener("click", function(){ illChoose(true); });
   $("illNo").addEventListener("click", function(){ illChoose(false); });
@@ -4381,6 +4403,7 @@ window.WYNNYX_REGISTRY = {
     $("pgNext").innerHTML = flip ? '<span class="long">Next Page &rarr;</span><span class="short">Next &rarr;</span>' : 'Next &rarr;';
     document.body.classList.toggle("paged", currentView === "reader" && m !== "scroll");
     closeCard(); closeRm();
+    if(m === "book") setTimeout(fsHintMaybe, 900); else if(typeof fsHintHide === "function") fsHintHide();
     if(currentView === "reader") window.scrollTo(0, 0);
     if(persist !== false) save(READ_KEY, m);
     setHdr();
@@ -4467,12 +4490,29 @@ window.WYNNYX_REGISTRY = {
     $("view-reader").classList.toggle("fs", on);
     document.body.classList.toggle("fs", on);
     $("fsBtn").setAttribute("aria-pressed", on ? "true" : "false");
+    fsHintHide();
     closeCard(); closePop();
     if(rmode === "scroll") window.scrollTo(0, 0);
     schedulePaginate();            /* re-measure on the next frame with the new container height */
     softPaginate();
   }
   function toggleFs(){ setFs(!fsOn); }
+  $("cardFs").addEventListener("click", toggleFs);
+  /* book mode, first two visits: a tip + glowing full-screen button (the middle of the page toggles full screen) */
+  var FSHINT_KEY = "wynnyx.fshint.v1", fsHintTimer = 0, fsHintOn = false, fsHintSeen = false;
+  function fsHintHide(){
+    clearTimeout(fsHintTimer); fsHintOn = false;
+    $("fsTip").classList.remove("show"); $("fsBtn").classList.remove("glow");
+  }
+  function fsHintMaybe(){
+    if(fsHintOn || fsHintSeen || fsOn || currentView !== "reader" || rmode !== "book" || styleOpen || illOpen) return;
+    var n = +load(FSHINT_KEY, 0) || 0;
+    if(n >= 2) return;
+    save(FSHINT_KEY, n + 1); fsHintSeen = true; fsHintOn = true;
+    $("fsTip").classList.add("show"); $("fsBtn").classList.add("glow");
+    fsHintTimer = setTimeout(fsHintHide, 9000);
+  }
+  rv.addEventListener("pointerdown", function(){ if(fsHintOn) fsHintHide(); }, true);
   $("fsBtn").addEventListener("click", toggleFs);
   $("fsExit").addEventListener("click", function(){ setFs(false); });
   $("orientClose").addEventListener("click", function(){ hintDismissed = true; schedulePaginate(); });
@@ -5236,6 +5276,7 @@ window.WYNNYX_REGISTRY = {
       "How do you like to read?":"คุณชอบอ่านแบบไหน?", "Pick a style — you can change it any time with the book button in the toolbar.":"เลือกสไตล์ที่ชอบ — เปลี่ยนได้ทุกเมื่อด้วยปุ่มรูปหนังสือบนแถบเครื่องมือ",
       "Scroll down the page, like a website.":"เลื่อนลงอ่านต่อเนื่อง เหมือนเว็บไซต์", "One page at a time. Tap the edges or use the arrow keys.":"ทีละหน้า แตะที่ขอบจอหรือใช้ปุ่มลูกศรเพื่อพลิกหน้า",
       "Two pages side by side with a 3D page turn and sound. Best on PC, tablet, or a phone turned sideways.":"สองหน้าเคียงกันพร้อมการพลิกหน้าแบบ 3 มิติและเสียงพลิกหน้า เหมาะกับคอมพิวเตอร์ แท็บเล็ต หรือโทรศัพท์แนวนอน", "Most immersive":"สมจริงที่สุด",
+      "Tap the middle of the page for full screen":"แตะกลางหน้ากระดาษเพื่ออ่านเต็มจอ",
       /* discover */
       "Story-first reading":"อ่านเรื่องราวเป็นหลัก", "Original dark fantasy & sci-fi to":"นิยายแฟนตาซีมืดและไซไฟต้นฉบับ ให้คุณ", "get lost in":"หลงใหลไปกับมัน",
       "Discover":"ค้นหา", "Featured Story":"เรื่องเด่น", "Upcoming Story":"เรื่องที่กำลังจะมา",
