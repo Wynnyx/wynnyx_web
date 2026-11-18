@@ -2397,11 +2397,10 @@ window.WYNNYX_REGISTRY = {
       card.innerHTML =
         '<div class="avatar pf" aria-hidden="true"></div>' +
         '<h3></h3>' +
-        '<div class="badges"><span class="badge ' + (c.role === "Main" ? "main" : "support") + '"></span><span class="badge camper">' + TENT_SVG + 'Camper</span></div>' +
+        '<div class="badges"><span class="badge camper">' + TENT_SVG + 'Camper</span></div>' +
         '<p class="bio"></p>' +
         '<span class="tap-hint">Tap to view profile <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>';
       card.querySelector("h3").textContent = c.name;
-      card.querySelector(".badge." + (c.role === "Main" ? "main" : "support")).textContent = c.role;
       card.querySelector(".bio").textContent = c.bio;
       loadImg(card.querySelector(".avatar"), c.image, c.name + " portrait", FACE_SVG, c.focus);
       grid.appendChild(card);
@@ -4997,8 +4996,7 @@ window.WYNNYX_REGISTRY = {
     charIdx = (i + CHARS.length) % CHARS.length;
     var c = CHARS[charIdx];
     $("dName").textContent = c.name;
-    $("dBadges").innerHTML = '<span class="badge ' + (c.role === "Main" ? "main" : "support") + '"></span><span class="badge camper">' + TENT_SVG + 'Camper</span>';
-    $("dBadges").firstChild.textContent = c.role;
+    $("dBadges").innerHTML = '<span class="badge camper">' + TENT_SVG + 'Camper</span>';
     var S = c.stats, rows = [["Age", fmtAge(S.age)], ["Height", S.height], ["Weight", S.weight], ["Hairstyle", S.hair], ["Eyes", S.eyes], ["Signature Trait", S.trait], ["Outfit", S.outfit, true]];
     var box = $("dStats"); box.innerHTML = "";
     rows.forEach(function(r){
