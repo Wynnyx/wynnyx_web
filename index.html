@@ -177,6 +177,8 @@ window.WYNNYX_REGISTRY = {
   .snd-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:.7rem;color:var(--muted)}
   .snd-row button{font:inherit;font-size:.74rem;color:var(--accent-2);border:1px solid rgba(var(--accent-rgb),.4);border-radius:999px;padding:0 10px;min-height:26px;background:transparent;cursor:pointer}
   .snd-row button:hover{background:var(--accent-soft)}
+  /* page-turn sound only exists in the 2-page book mode */
+  #view-reader:not([data-rmode="book"]) #sndBtn{display:none}
   #sndBtn .snd-off{display:none}
   #sndBtn[aria-pressed="false"] .snd-on{display:none}
   #sndBtn[aria-pressed="false"] .snd-off{display:block}
@@ -4283,6 +4285,7 @@ window.WYNNYX_REGISTRY = {
     }
     rmode = m;
     $("view-reader").setAttribute("data-rmode", m);
+    if(m !== "book" && typeof closeSnd === "function") closeSnd();
     document.querySelectorAll(".rm-btn[data-rmode]").forEach(function(b){
       b.setAttribute("aria-checked", b.dataset.rmode === m ? "true" : "false");
     });
