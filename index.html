@@ -448,6 +448,12 @@ window.WYNNYX_REGISTRY = {
     font-variant-numeric:tabular-nums;
   }
   .zoom-pill:hover{box-shadow:0 0 14px var(--glow)}
+  /* PC: Word Assist + text size live in a floating dock (bottom-right) so they stay reachable while scrolling and in full screen */
+  .read-dock{position:fixed;right:18px;bottom:18px;z-index:70;display:none;align-items:center;gap:8px;padding:6px;border-radius:999px;
+    background:color-mix(in srgb,var(--surface) 94%,transparent);border:1px solid var(--line);box-shadow:0 10px 30px var(--shadow)}
+  body[data-view="reader"] .read-dock.on{display:flex}
+  body.fs .read-dock{z-index:10000}
+  body.fs .pop{z-index:10002}
   .zoom-pill svg{width:15px;height:15px}
 
   .chapter-label{font-size:.62em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);text-align:center;font-family:var(--sans)}
@@ -1902,6 +1908,8 @@ window.WYNNYX_REGISTRY = {
   </div>
 </div>
 
+<div class="read-dock" id="readDock" role="group" aria-label="Reading controls"></div>
+
 <!-- ================= READER VIEW ================= -->
 <div id="view-reader" data-rmode="scroll" hidden>
   <div class="reader-bar">
@@ -3262,11 +3270,12 @@ window.WYNNYX_REGISTRY = {
   $("sizeReset").addEventListener("click", function(){ setScale(100); });
 
   function placePop(){
-    var r = sizeBtn.getBoundingClientRect();
+    var anc = ($("readDock").classList.contains("on") && currentView === "reader") ? $("zoomPill") : sizeBtn;   /* PC reader: anchor to the dock, wherever the page is scrolled */
+    var r = anc.getBoundingClientRect();
     var w = pop.offsetWidth, pad = 10;
     var left = Math.max(pad, Math.min(r.right - w, window.innerWidth - w - pad));
     pop.style.left = left + "px";
-    pop.style.top = (r.bottom + 10) + "px";
+    pop.style.top = (r.top > window.innerHeight / 2 ? Math.max(pad, r.top - pop.offsetHeight - 10) : r.bottom + 10) + "px";   /* the PC dock sits at the bottom: open upwards */
   }
   var rmPop = $("rmPop"), rmBtn = $("rmBtn");
   function placeRm(){
@@ -3286,6 +3295,19 @@ window.WYNNYX_REGISTRY = {
     e.stopPropagation();
     rmPop.classList.contains("open") ? closeRm() : openRm();
   });
+  /* PC dock: move Word Assist + text size out of the (scrolling / full-screen-hidden) toolbar into a fixed bottom-right dock */
+  (function(){
+    var dock = $("readDock"), bar = document.querySelector(".rb-right"), a = $("assistBtn"), z = $("zoomPill");
+    var mq = window.matchMedia("(min-width:900px) and (hover:hover) and (pointer:fine)");
+    function place(){
+      if(mq.matches){ dock.appendChild(a); dock.appendChild(z); dock.classList.add("on"); }
+      else { bar.appendChild(a); bar.appendChild(z); dock.classList.remove("on"); }
+      if(pop.classList.contains("open")) placePop();
+    }
+    place();
+    if(mq.addEventListener) mq.addEventListener("change", place); else if(mq.addListener) mq.addListener(place);
+  })();
+
   function openPop(){
     closeCard(); closeRm(); closeSnd();
     placePop();
@@ -4375,7 +4397,7 @@ window.WYNNYX_REGISTRY = {
   /* swipes may start anywhere (margins, blank bar space) except on an actual control */
   function skipSwipe(el){ return !!(el.closest && el.closest(".orient-hint,select,input,textarea,a,button:not(.w):not(.ec-next):not(.ec-btn):not(.pc-btn)")); }
   /* taps ignore the toolbars so their blank space never toggles full screen */
-  function skipTarget(el){ return skipSwipe(el) || !!(el.closest && el.closest(".pager,.reader-bar,.fs-bar")); }
+  function skipTarget(el){ return skipSwipe(el) || !!(el.closest && el.closest(".pager,.reader-bar,.fs-bar,.read-dock")); }
   rv.addEventListener("click", function(e){
     if(rmode === "scroll" || currentView !== "reader") return;
     if(Date.now() < T.block) return;                    /* the click that follows a swipe is not a tap */
