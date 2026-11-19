@@ -3692,7 +3692,7 @@ window.WYNNYX_REGISTRY = {
       b.type = "button"; b.className = "rm-btn"; b.setAttribute("role", "radio"); b.dataset.level = o.id; b.setAttribute("aria-checked", "false");
       b.innerHTML = '<span class="ico">' + levelBars(o.bars) + '</span><span><b>' + o.name + '</b>' + (o.tag ? '<span class="lv-tag">' + o.tag + '</span>' : '') +
         '<small>' + o.desc + '</small>' +
-        (o.id === "off" ? '' : '<small class="lv-ex"><span>Examples:</span> <i></i></small><small class="lv-n"><span>Underlined words in this chapter:</span> <em></em></small>');
+        (o.id === "off" ? '' : '<small class="lv-ex"><span>Examples:</span> <i></i></small><small class="lv-n"><span>Average underlined words per chapter:</span> <em></em></small>');
       b.addEventListener("click", function(){ setLevel(o.id); });
       host.appendChild(b);
     });
@@ -3704,14 +3704,15 @@ window.WYNNYX_REGISTRY = {
   }
   function syncLevelUI(){
     var host = $("setLevelList"); if(!host) return;
-    var cid = CHAPTERS[curChap] ? curChap : "c1", keys = chapterWordKeys(cid);
+    var ids = Object.keys(CHAPTERS).filter(function(id){ return /^c\d+$/.test(id); }), per = ids.map(chapterWordKeys), keys = [].concat.apply([], per);   /* real chapters only (not the sample) */
     host.querySelectorAll(".rm-btn").forEach(function(b){
       var id = b.dataset.level, on = id === "off" ? !assistOn : (assistOn && id === WLEVEL_ID);
       b.setAttribute("aria-checked", on ? "true" : "false");
       if(id === "off") return;
       var lv = WLEVELS[id], n = 0, ex = [], seen = {};
+      per.forEach(function(ks){ ks.forEach(function(k){ if(wMin(k) <= lv) n++; }); });
+      n = per.length ? Math.round(n / per.length) : 0;                          /* average per chapter, so it stays true as chapters are added */
       keys.forEach(function(k){
-        if(wMin(k) <= lv) n++;
         if(wMin(k) === lv && !seen[k] && k.length <= 20 && !/^(stood out against|make a call|caught himself|combination|hesitated)$/.test(k) && ex.length < 4){ seen[k] = 1; ex.push(k.charAt(0).toUpperCase() + k.slice(1)); }
       });
       b.querySelector(".lv-ex i").textContent = ex.join(", ");
@@ -5420,7 +5421,7 @@ window.WYNNYX_REGISTRY = {
       "Beginner (A1\u2013A2)":"ระดับเริ่มต้น (A1\u2013A2)", "Most assistance":"ช่วยมากที่สุด", "For readers who understand basic English but struggle with descriptive writing and unfamiliar vocabulary.":"สำหรับผู้อ่านที่เข้าใจภาษาอังกฤษพื้นฐาน แต่ยังติดขัดกับงานเขียนเชิงบรรยายและคำศัพท์ที่ไม่คุ้นเคย",
       "Intermediate (B1\u2013B2)":"ระดับกลาง (B1\u2013B2)", "Balanced":"สมดุล", "For readers who can comfortably read everyday English but may struggle with literary expressions, idioms, and less common vocabulary.":"สำหรับผู้ที่อ่านภาษาอังกฤษในชีวิตประจำวันได้สบาย แต่ยังติดกับสำนวนวรรณกรรม สำนวนเปรียบเทียบ และคำศัพท์ที่ไม่ค่อยพบ",
       "Advanced (C1\u2013C2)":"ระดับสูง (C1\u2013C2)", "Least assistance":"ช่วยน้อยที่สุด", "For confident English readers who might appreciate explanations of nuanced expressions and figurative language.":"สำหรับผู้อ่านที่มั่นใจในภาษาอังกฤษ และอาจอยากได้คำอธิบายสำนวนที่ละเอียดอ่อนและภาษาเชิงเปรียบเทียบ",
-      "Examples:":"ตัวอย่าง:", "Underlined words in this chapter:":"คำที่ขีดเส้นใต้ในบทนี้:",
+      "Examples:":"ตัวอย่าง:", "Average underlined words per chapter:":"คำที่ขีดเส้นใต้เฉลี่ยต่อบท:",
       /* discover */
       "Story-first reading":"อ่านเรื่องราวเป็นหลัก", "Original dark fantasy & sci-fi to":"นิยายแฟนตาซีมืดและไซไฟต้นฉบับ ให้คุณ", "get lost in":"หลงใหลไปกับมัน",
       "Discover":"ค้นหา", "Featured Story":"เรื่องเด่น", "Upcoming Story":"เรื่องที่กำลังจะมา",
