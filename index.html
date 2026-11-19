@@ -354,6 +354,18 @@ window.WYNNYX_REGISTRY = {
     .set-panel .rm-list{grid-template-columns:1fr}
     .set-panel .rm-btn{flex-direction:row;align-items:center;gap:12px;padding:10px 12px;height:auto}
   }
+  /* Word Assist levels (Settings) */
+  .set-panel .lvl-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .set-panel .lvl-list .rm-btn{flex-direction:row;align-items:flex-start;gap:12px;padding:12px;height:100%}
+  .lvl-list .ico{margin-top:1px}
+  .lvl-list .rm-btn small{margin-top:5px}
+  .lv-tag{display:inline-block;margin:3px 0 1px;padding:1px 9px;border-radius:999px;font-size:.68rem;font-weight:600;letter-spacing:.02em;background:var(--accent-soft);color:var(--accent-2)}
+  .lvl-list [data-level="beginner"] .lv-tag{background:rgba(70,170,110,.18);color:#5cc98a}
+  .lvl-list [data-level="intermediate"] .lv-tag{background:rgba(70,130,220,.18);color:#6fa8ff}
+  .lvl-list [data-level="advanced"] .lv-tag{background:rgba(150,100,230,.2);color:#b794ff}
+  .lv-ex i{font-style:normal;color:var(--text)}
+  .lv-n em{font-style:normal;font-weight:600;color:var(--accent-2)}
+  @media (max-width:640px){ .set-panel .lvl-list{grid-template-columns:1fr} }
   @media (prefers-reduced-motion:reduce){.modal.set-panel,#setScrim{transition:opacity .01s}}
 
   /* "How Wynnyx Works" modal */
@@ -1629,14 +1641,10 @@ window.WYNNYX_REGISTRY = {
 
       <section class="sp-sec" aria-labelledby="lblTools">
         <div class="sp-sec-h"><span class="sp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 16 8"/><path d="m14 6 4 4"/><path d="M18 2v3M16.5 3.5h3M6 3v2M5 4h2"/></svg></span><div><h3 id="lblTools">Reading Tools</h3><p>Helpers that sit on top of the story text.</p></div></div>
-        <div class="set-assist sp-tool">
-          <div>
-            <span class="nm">Word Assist</span>
-            <div class="set-help" style="margin-top:.15rem">Underlined words and tap-for-meaning cards in the reader.</div>
-          </div>
-          <button type="button" class="assist assist-toggle" id="setAssistBtn" role="switch" aria-checked="true" aria-label="Word Assist">
-            <span class="sw" aria-hidden="true"><i></i></span><b>ON</b>
-          </button>
+        <div class="sp-tool">
+          <span class="nm">Word Assist</span>
+          <div class="set-help" style="margin:.15rem 0 .8rem">Choose how much help you get with English words.</div>
+          <div class="rm-list lvl-list" id="setLevelList" role="radiogroup" aria-label="Word Assist"></div>
         </div>
       </section>
 
@@ -2169,7 +2177,63 @@ window.WYNNYX_REGISTRY = {
     accompanied: { ipa:"/əˈkʌmpənid/", pos:"verb", translations:{ th:"มาพร้อมกับ, ตามมาด้วย", ja:"伴った、付き添った", zh:"伴随，陪同", es:"acompañó, fue acompañado de", fr:"accompagné, a accompagné" } },
     seeped: { ipa:"/siːpt/", pos:"verb", translations:{ th:"ซึมเข้ามา, รั่วซึม", ja:"染み込んだ、じわじわ漏れた", zh:"渗入，渗漏", es:"se filtró, se coló", fr:"s'est infiltré, a suinté" } },
     rationalized: { ipa:"/ˈræʃənəlaɪzd/", pos:"verb", translations:{ th:"หาเหตุผลมาอธิบาย, อ้างเหตุผลปลอบใจตัวเอง", ja:"理屈をつけて説明した、自分を納得させた", zh:"找理由解释，自我开脱", es:"racionalizó, se justificó", fr:"a rationalisé, s'est justifié" } },
-    intruder: { ipa:"/ɪnˈtruːdər/", pos:"noun", translations:{ th:"ผู้บุกรุก", ja:"侵入者", zh:"入侵者", es:"intruso", fr:"intrus" } }
+    intruder: { ipa:"/ɪnˈtruːdər/", pos:"noun", translations:{ th:"ผู้บุกรุก", ja:"侵入者", zh:"入侵者", es:"intruso", fr:"intrus" } },
+    /* ---- more Chapter 1 + 2 glossary (levels: see WTIER) ---- */
+    "fumbling": { ipa:"/ˈfʌmblɪŋ/", pos:"verb", translations:{ th:"คลำหาอย่างงุ่มง่าม", ja:"手探りする、もたもたと探る", zh:"笨拙地摸索", es:"buscando a tientas, manoseando con torpeza", fr:"tâtonnant, farfouillant" } },
+    "nightstand": { ipa:"/ˈnaɪtstænd/", pos:"noun", translations:{ th:"โต๊ะข้างเตียง", ja:"ナイトテーブル、ベッドサイドテーブル", zh:"床头柜", es:"mesita de noche", fr:"table de chevet" } },
+    "swig": { ipa:"/swɪɡ/", pos:"noun", translations:{ th:"การกระดกดื่มอึกใหญ่", ja:"ぐいっと飲むこと", zh:"大口喝；一大口", es:"trago largo", fr:"grande gorgée" } },
+    "lantern": { ipa:"/ˈlæntərn/", pos:"noun", translations:{ th:"ตะเกียง, โคมไฟ", ja:"ランタン、手提げ灯", zh:"提灯，灯笼", es:"linterna, farol", fr:"lanterne" } },
+    "rustling": { ipa:"/ˈrʌslɪŋ/", pos:"verb", translations:{ th:"เสียงเสียดสีกันเบาๆ (ของใบไม้ พุ่มไม้)", ja:"カサカサと音を立てる", zh:"沙沙作响", es:"crujiendo, susurrando", fr:"bruissant, froissant" } },
+    "jolted": { ipa:"/dʒoʊltɪd/", pos:"verb", translations:{ th:"สะดุ้งตื่น, กระตุกอย่างแรง", ja:"びくっとした、はっと動いた", zh:"猛地一震，惊跳", es:"se sobresaltó", fr:"sursauta" } },
+    "relatives": { ipa:"/ˈrɛlətɪvz/", pos:"noun", translations:{ th:"ญาติ", ja:"親戚", zh:"亲戚", es:"familiares, parientes", fr:"parents, famille proche" } },
+    "flock": { ipa:"/flɑːk/", pos:"noun", translations:{ th:"ฝูง (เช่น ฝูงนก)", ja:"群れ", zh:"一群（鸟、羊等）", es:"bandada, rebaño", fr:"volée, troupeau" } },
+    "draft": { ipa:"/dræft/", pos:"noun", translations:{ th:"ลมเย็นที่พัดลอดเข้ามา", ja:"すきま風", zh:"穿堂风，冷风", es:"corriente de aire", fr:"courant d'air" } },
+    "cellar": { ipa:"/ˈsɛlər/", pos:"noun", translations:{ th:"ห้องใต้ดิน", ja:"地下室、貯蔵庫", zh:"地窖，地下室", es:"sótano, bodega", fr:"cave" } },
+    "flashlight": { ipa:"/ˈflæʃlaɪt/", pos:"noun", translations:{ th:"ไฟฉาย", ja:"懐中電灯", zh:"手电筒", es:"linterna", fr:"lampe de poche" } },
+    "hesitated": { ipa:"/ˈhɛzɪteɪtɪd/", pos:"verb", translations:{ th:"ลังเล, ชะงัก", ja:"ためらった", zh:"犹豫了", es:"dudó, vaciló", fr:"hésita" } },
+    "grip": { ipa:"/ɡrɪp/", pos:"noun", translations:{ th:"ด้ามจับ, การกำจับ", ja:"握り、グリップ", zh:"握把，握力", es:"empuñadura, agarre", fr:"poignée, prise" } },
+    "aisle": { ipa:"/aɪl/", pos:"noun", translations:{ th:"ทางเดินแคบระหว่างชั้นวาง", ja:"通路", zh:"过道，走道", es:"pasillo", fr:"allée" } },
+    "ambush": { ipa:"/ˈæmbʊʃ/", pos:"noun", translations:{ th:"การซุ่มโจมตี", ja:"待ち伏せ", zh:"埋伏", es:"emboscada", fr:"embuscade" } },
+    "antiques": { ipa:"/ænˈtiːks/", pos:"noun", translations:{ th:"ของเก่า, ของโบราณ", ja:"骨董品、アンティーク", zh:"古董", es:"antigüedades", fr:"antiquités" } },
+    "rafters": { ipa:"/ˈræftərz/", pos:"noun", translations:{ th:"ขื่อหลังคา, โครงไม้หลังคา", ja:"垂木、屋根の梁", zh:"椽子，房梁", es:"vigas del techo", fr:"chevrons, poutres" } },
+    "scrambled": { ipa:"/ˈskræmbəld/", pos:"verb", translations:{ th:"ตะกายขึ้น, รีบปีนอย่างลนลาน", ja:"慌てて這い上がった", zh:"手忙脚乱地爬", es:"trepó a toda prisa", fr:"se précipita en grimpant" } },
+    "padlock": { ipa:"/ˈpædlɑːk/", pos:"noun", translations:{ th:"กุญแจคล้อง", ja:"南京錠", zh:"挂锁", es:"candado", fr:"cadenas" } },
+    "lunged": { ipa:"/lʌndʒd/", pos:"verb", translations:{ th:"พุ่งเข้าใส่", ja:"突進した、飛びかかった", zh:"猛扑过去", es:"se abalanzó", fr:"se jeta" } },
+    "shards": { ipa:"/ʃɑːrdz/", pos:"noun", translations:{ th:"เศษแก้วแหลมคม, เศษแตก", ja:"破片", zh:"碎片", es:"esquirlas, fragmentos", fr:"éclats" } },
+    "crouched": { ipa:"/kraʊtʃt/", pos:"verb", translations:{ th:"นั่งยองๆ, ย่อตัวลง", ja:"しゃがんだ", zh:"蹲下", es:"se agachó", fr:"s'accroupit" } },
+    "piercingly": { ipa:"/ˈpɪrsɪŋli/", pos:"adverb", translations:{ th:"อย่างแหลมบาดหู, แหลมเสียดแทง", ja:"耳をつんざくように、鋭く", zh:"尖锐刺耳地", es:"de forma penetrante, estridentemente", fr:"de façon perçante" } },
+    "muffled": { ipa:"/ˈmʌfəld/", pos:"adjective", translations:{ th:"อู้อี้, ไม่ชัดเจน (เสียงที่ถูกบัง)", ja:"くぐもった", zh:"闷闷的，被捂住的", es:"ahogado, apagado", fr:"étouffé, sourd" } },
+    "reassuring": { ipa:"/ˌriːəˈʃʊrɪŋ/", pos:"adjective", translations:{ th:"ที่ทำให้อุ่นใจ, ปลอบใจ", ja:"安心させる", zh:"令人安心的", es:"tranquilizador", fr:"rassurant" } },
+    "vanishing without a trace": { ipa:"/ˈvænɪʃɪŋ wɪðˈaʊt ə treɪs/", pos:"phrase", translations:{ th:"หายตัวไปอย่างไร้ร่องรอย", ja:"跡形もなく姿を消す", zh:"消失得无影无踪", es:"desaparecer sin dejar rastro", fr:"disparaître sans laisser de trace" } },
+    "tension": { ipa:"/ˈtɛnʃən/", pos:"noun", translations:{ th:"ความตึงเครียด", ja:"緊張、張りつめた空気", zh:"紧张气氛", es:"tensión", fr:"tension" } },
+    "drab": { ipa:"/dræb/", pos:"adjective", translations:{ th:"หม่นๆ, ทึมๆ ไม่สะดุดตา", ja:"くすんだ、味気ない", zh:"灰暗单调的", es:"apagado, soso", fr:"terne, fade" } },
+    "draped": { ipa:"/dreɪpt/", pos:"verb", translations:{ th:"ถูกคลุมไว้, ปกคลุมอยู่", ja:"覆われた、垂れかかった", zh:"笼罩着，披盖着", es:"envuelto, cubierto", fr:"drapé, recouvert" } },
+    "hammered": { ipa:"/ˈhæmərd/", pos:"verb", translations:{ th:"เต้นรัวแรง, ทุบตี", ja:"激しく打った", zh:"猛烈地跳动，捶击", es:"martilleó", fr:"martelait, cognait" } },
+    "dead silence": { ipa:"/dɛd ˈsaɪləns/", pos:"noun", translations:{ th:"ความเงียบสงัดสนิท", ja:"死のような静けさ", zh:"死一般的寂静", es:"silencio sepulcral", fr:"silence de mort" } },
+    "deadbolt": { ipa:"/ˈdɛdboʊlt/", pos:"noun", translations:{ th:"กลอนประตูแบบนิรภัย", ja:"デッドボルト（頑丈なかんぬき錠）", zh:"插销锁，死锁", es:"cerrojo de seguridad", fr:"verrou" } },
+    "creak": { ipa:"/kriːk/", pos:"noun", translations:{ th:"เสียงเอี๊ยดอ๊าด (ของบานพับ พื้นไม้)", ja:"きしむ音", zh:"吱呀声", es:"crujido, chirrido", fr:"grincement" } },
+    "sentimental": { ipa:"/ˌsɛntɪˈmɛntl/", pos:"adjective", translations:{ th:"ที่มีคุณค่าทางใจ, เกี่ยวกับความทรงจำ", ja:"思い出深い、感傷的な", zh:"感情上珍贵的", es:"sentimental, de valor afectivo", fr:"sentimental, affectif" } },
+    "frantically": { ipa:"/ˈfræntɪkli/", pos:"adverb", translations:{ th:"อย่างลนลาน, อย่างตื่นตระหนก", ja:"必死に、慌てふためいて", zh:"疯狂地，惊慌失措地", es:"frenéticamente", fr:"frénétiquement" } },
+    "flanked": { ipa:"/flæŋkt/", pos:"verb", translations:{ th:"ขนาบข้าง", ja:"両側に並ばれた", zh:"两侧排列着，簇拥着", es:"flanqueado", fr:"flanqué" } },
+    "cramped": { ipa:"/kræmpt/", pos:"adjective", translations:{ th:"คับแคบ, อัดแน่น", ja:"窮屈な、狭苦しい", zh:"狭窄拥挤的", es:"estrecho, atestado", fr:"exigu, à l'étroit" } },
+    "ceramic": { ipa:"/səˈræmɪk/", pos:"adjective", translations:{ th:"ทำจากเซรามิก, เครื่องปั้นดินเผา", ja:"陶器の、セラミックの", zh:"陶瓷的", es:"de cerámica", fr:"en céramique" } },
+    "strained": { ipa:"/streɪnd/", pos:"adjective", translations:{ th:"ตึงเครียด, ฝืนๆ", ja:"張りつめた、無理をした", zh:"紧绷的，勉强的", es:"forzado, tenso", fr:"tendu, forcé" } },
+    "tactical": { ipa:"/ˈtæktɪkəl/", pos:"adjective", translations:{ th:"เชิงยุทธวิธี, สำหรับปฏิบัติการ", ja:"戦術用の", zh:"战术的", es:"táctico", fr:"tactique" } },
+    "hastily": { ipa:"/ˈheɪstɪli/", pos:"adverb", translations:{ th:"อย่างรีบร้อน, ลวกๆ", ja:"急いで、慌ただしく", zh:"仓促地", es:"apresuradamente", fr:"à la hâte" } },
+    "scrawled": { ipa:"/skrɔːld/", pos:"verb", translations:{ th:"เขียนขยุกขยิก, เขียนลวกๆ", ja:"殴り書きされた", zh:"潦草地写", es:"garabateado", fr:"griffonné" } },
+    "illuminated": { ipa:"/ɪˈluːmɪneɪtɪd/", pos:"verb", translations:{ th:"ส่องสว่าง, ทำให้สว่างขึ้น", ja:"照らした", zh:"照亮", es:"iluminó", fr:"éclaira" } },
+    "blind spot": { ipa:"/blaɪnd spɑːt/", pos:"noun", translations:{ th:"จุดบอด (ที่มองไม่เห็น)", ja:"死角", zh:"盲区，视觉死角", es:"punto ciego", fr:"angle mort" } },
+    "earshot": { ipa:"/ˈɪrʃɑːt/", pos:"noun", translations:{ th:"ระยะที่สามารถได้ยินเสียง", ja:"声が届く範囲", zh:"听力所及的范围", es:"al alcance del oído", fr:"portée de voix" } },
+    "go out of their way": { ipa:"/ɡoʊ aʊt əv ðɛr weɪ/", pos:"idiom", translations:{ th:"อุตส่าห์ทำบางสิ่งให้ (ยอมลำบากทำเกินความจำเป็น)", ja:"わざわざ〜する", zh:"特意去做，不辞辛劳地做", es:"tomarse la molestia de, esforzarse por", fr:"se donner la peine de" } },
+    "jumping at shadows": { ipa:"/ˈdʒʌmpɪŋ æt ˈʃædoʊz/", pos:"idiom", translations:{ th:"หวาดระแวงไปกับสิ่งที่อาจไม่มีอยู่จริง", ja:"些細なことにおびえる", zh:"草木皆兵，疑神疑鬼", es:"asustarse de su propia sombra", fr:"avoir peur de son ombre" } },
+    "a wave of ice washing down his spine": { ipa:"/ə weɪv əv aɪs ˈwɑːʃɪŋ daʊn hɪz spaɪn/", pos:"figurative phrase", translations:{ th:"ความเย็นยะเยือกแล่นไปตามกระดูกสันหลัง (ตกใจกลัวมาก)", ja:"背筋が凍りつく", zh:"一股寒意顺着脊背蔓延（极度恐惧）", es:"un escalofrío le recorrió la espalda", fr:"un frisson glacé lui parcourut l'échine" } },
+    "heart gave a sudden flutter": { ipa:"/hɑːrt ɡeɪv ə ˈsʌdn ˈflʌtər/", pos:"figurative phrase", translations:{ th:"หัวใจเต้นระรัวขึ้นมาอย่างฉับพลัน (ตื่นเต้น/ประหม่า)", ja:"心臓がどきっとした", zh:"心头猛地一颤", es:"el corazón le dio un vuelco", fr:"son cœur eut un battement soudain" } },
+    "talk himself out of it": { ipa:"/tɔːk hɪmˈsɛlf aʊt əv ɪt/", pos:"idiom", translations:{ th:"พูดโน้มน้าวตัวเองให้ล้มเลิก", ja:"自分を説得してやめる", zh:"自己说服自己放弃", es:"convencerse a sí mismo de no hacerlo", fr:"se dissuader lui-même" } },
+    "make a call": { ipa:"/meɪk ə kɔːl/", pos:"idiom", translations:{ th:"ตัดสินใจ (เลือกทางใดทางหนึ่ง)", ja:"決断を下す", zh:"做出决定", es:"tomar una decisión", fr:"trancher, prendre une décision" } },
+    "stood out against": { ipa:"/stʊd aʊt əˈɡɛnst/", pos:"phrase", translations:{ th:"โดดเด่นตัดกับ", ja:"〜に対して際立っていた", zh:"与…形成鲜明对比", es:"destacaba contra", fr:"se détachait sur" } },
+    "caught himself": { ipa:"/kɔːt hɪmˈsɛlf/", pos:"idiom", translations:{ th:"ยั้งตัวเองไว้ทัน, หยุดตัวเองทัน", ja:"はっと我に返って止めた", zh:"及时克制住自己", es:"se contuvo a tiempo", fr:"se retint à temps" } },
+    "felt like lead": { ipa:"/fɛlt laɪk lɛd/", pos:"figurative phrase", translations:{ th:"หนักอึ้งราวกับตะกั่ว", ja:"鉛のように重く感じた", zh:"沉重得像灌了铅", es:"pesaban como plomo", fr:"lourd comme du plomb" } },
+    "spike of pure dread": { ipa:"/spaɪk əv pjʊr drɛd/", pos:"figurative phrase", translations:{ th:"ความหวาดกลัวที่พุ่งแปลบขึ้นมา", ja:"突き上げるような恐怖", zh:"一阵猛烈的恐惧", es:"una punzada de puro pavor", fr:"un pic d'effroi" } }
   };
 
   /* ---------- Story content ----------
@@ -2192,32 +2256,32 @@ window.WYNNYX_REGISTRY = {
         "I felt a cold breeze brush against my hair, pulling a slow breath into my lungs. It seemed I was… awake.",
         "I shifted onto my side, trying to find a comfortable position on the small bed. It was stiff, but I was too tired to care.",
         "I stretched my legs, feeling a dull ache in my muscles, though I couldn't quite tell why. My eyes were closed, my mind still caught in that heavy fog between dreaming and waking.",
-        "\"Ugh,\" I grumbled. Fumbling with the blankets, I dragged myself upright, sat on the edge of the bed, and yawned into the dark room.",
-        "Almost [[instinctively]], my hands started moving before my [[groggy]] mind could even catch up. I reached out in the dark, fumbling blindly for the beer bottle on the nightstand. All the lights were off. Apart from the faint light coming through the window, I could barely see anything.",
+        "\"Ugh,\" I grumbled. [[Fumbling|fumbling]] with the blankets, I dragged myself upright, sat on the edge of the bed, and yawned into the dark room.",
+        "Almost [[instinctively]], my hands started moving before my [[groggy]] mind could even catch up. I reached out in the dark, [[fumbling]] blindly for the beer bottle on the [[nightstand]]. All the lights were off. Apart from the faint light coming through the window, I could barely see anything.",
         "\"Where is it?\" I whispered. Hmmm.. There.",
         "There it is.",
         "But as my hand closed around the bottle, my elbow clipped the empty drinking glass. It tipped off the edge, [[shattering]] on the wooden floorboards.",
-        "\"Ugh, man,\" I whispered, disappointment heavy in my voice. But the beer was already in my hand. Nothing was going to stop me from taking a drink. I popped the cap and took a slow swig.",
+        "\"Ugh, man,\" I whispered, disappointment heavy in my voice. But the beer was already in my hand. Nothing was going to stop me from taking a drink. I popped the cap and took a slow [[swig]].",
         "\"Babe?\" a tired female voice mumbled from the pillows behind me as I set the bottle back down.",
         "A debate rushed into my mind: Can I just go back to sleep and deal with the broken glass tomorrow, or should I clean it up now so I don't step on it in the morning?",
-        "I decided to just get it over with. But as I was about to put my bare foot down and reach for the lantern, I heard something outside the window.",
-        "Branches… or… bushes rustling…. Shifting….",
+        "I decided to just get it over with. But as I was about to put my bare foot down and reach for the [[lantern]], I heard something outside the window.",
+        "Branches… or… bushes [[rustling]]…. Shifting….",
         "I didn't think much of it at first. My hand was already hovering over the light switch. But something deep inside me—a sudden, quiet instinct—told me to wait. To keep the light off.",
         "The sound continued. It was like branches snapping, but it wasn't from the wind. It was from something moving out there in the dark. An animal was my best guess.",
-        "Then, I heard it. A noise caught halfway between a [[raspy]] whisper and an animal's cry. It didn't sound aggressive, but it certainly wasn't natural either. It was a weak, piercingly high-pitched…. screech?",
+        "Then, I heard it. A noise caught halfway between a [[raspy]] whisper and an animal's cry. It didn't sound aggressive, but it certainly wasn't natural either. It was a weak, [[piercingly]] high-pitched…. screech?",
         "\"What—\"",
-        "Darren jolted violently awake, his head snapping up from the desk.",
+        "Darren [[jolted]] violently awake, his head snapping up from the desk.",
         "He gasped for air, his heart hammering against his ribs. Slowly, his vision adjusted.",
-        "The [[suffocating]] darkness, the lantern, and the freezing cabin faded away like smoke, replaced by the bright [[fluorescent]] lights, the warm afternoon sun pouring through the window, and the sound of his classmates and the teacher.",
+        "The [[suffocating]] darkness, the [[lantern]], and the freezing cabin faded away like smoke, replaced by the bright [[fluorescent]] lights, the warm afternoon sun pouring through the window, and the sound of his classmates and the teacher.",
         "That was right. He was in the classroom. Reality was finally starting to make sense.",
         "Me in a cabin in the woods? I have a girlfriend, and I drink beer? None of that sounded like him. It wasn't and would never be his life.",
         "Darren let out a shaky sigh of relief, but then he realized what he had just done. Pairs of eyes were staring at him from all across the room. The lecture had stopped. It didn't take him long to figure out what had happened.",
         "He looked at Charlie in the seat next to him. His best friend's eyes were filled with confusion and worry. \"Dude… what's… going on?\"",
         "When he had gasped for air, he'd been loud. Way too loud for a quiet classroom. But waking up like that hadn't been under his control.",
         "\"I….\" Darren didn't even finish before turning toward the front of the room. The teacher was staring at him, looking genuinely concerned. \"I… I had a nightmare.\"",
-        "Instantly, the room began to fill with low whispers and muffled giggles. They tried to keep it quiet, but Darren could still hear people laughing at him.",
+        "Instantly, the room began to fill with low whispers and [[muffled]] giggles. They tried to keep it quiet, but Darren could still hear people laughing at him.",
         "His face burned. Anyone would feel embarrassed in a moment like that, and his stomach twisted knowing they were making fun of him. But he still couldn't fully care. He hadn't completely escaped the dream yet. That chilling, high-pitched screech still [[lingered]] quietly in the back of his mind.",
-        "\"Hey.\" Charlie whispered, breaking the heavy tension. He put a reassuring hand on Darren's shoulder. \"It's okay, man. Everyone has nightmares, right?\"",
+        "\"Hey.\" Charlie whispered, breaking the heavy [[tension]]. He put a [[reassuring]] hand on Darren's shoulder. \"It's okay, man. Everyone has nightmares, right?\"",
         "He shifted into a lighter, joking tone. \"Last night, I even had one about a kitten jumping on the table, climbing the curtains, and almost bringing the ceiling fan down on my head. Like, how does a cat even do that?\"",
         "Charlie laughed softly, offering a small, reassuring smile. \"Man, it's all good.\" But Darren still wasn't quite okay. He just kept his eyes locked on the open notebook on his desk, staring at the pages as if that could somehow make the heavy embarrassment go away.",
         "Ten minutes later.",
@@ -2226,55 +2290,55 @@ window.WYNNYX_REGISTRY = {
         "\"Hey, Darren.\"",
         "The voice was familiar. It didn't take him long to recognize it. Jenna?",
         "He turned around and saw Jenna approaching with her friend, Stacy. They were both his classmates, and even though they weren't particularly close, Jenna had always been nice to him. Stacy, too.",
-        "As the overhead lights caught Jenna's face while she moved closer, he couldn't help but notice how cute she looked. The way her honey-blonde hair shifted as she shook her head a little, perfectly matching the color of her jacket, and the way her jeans stood out against the drab lockers. She looked stunning.",
+        "As the overhead lights caught Jenna's face while she moved closer, he couldn't help but notice how cute she looked. The way her honey-blonde hair shifted as she shook her head a little, perfectly matching the color of her jacket, and the way her jeans [[stood out against]] the [[drab]] lockers. She looked stunning.",
         "But he couldn't focus on that right now. Why was she… approaching him?",
         "\"Hi?\" he answered cautiously.",
         "Deep down, he was secretly hoping she wasn't about to bring up his embarrassing classroom nightmare. Darren laughed at his own thoughts.",
         "She wouldn't. From what he knew, Jenna wasn't the type of person to bring it up just to make fun of him.",
         "\"Hey... umm… since tomorrow's a holiday and school is closed for the entire weekend, a few of us are planning a camping trip out to Ravenwood,\" Jenna said smoothly, her voice confident. \"Would you want to...\" she paused, hesitated, \"...come with us?\"",
         "Darren's expression shifted immediately. Ravenwood was an [[expansive]], dense forest. It had beautiful [[terrain]] and amazing-looking nature. It was located in Northvale, the city next to their home city... it wouldn't take long to travel there, but the forest was also wrapped in creepy local legends—at least from the rumors he'd heard around town. Especially the west side.",
-        "People talked about hearing human-like screams deep in the trees, and there were even stories of hikers vanishing without a trace.",
+        "People talked about hearing human-like screams deep in the trees, and there were even stories of hikers [[vanishing without a trace]].",
         "But… those were just local rumors, internet theories, and ghost stories. It felt stupid to take any of that stuff seriously.",
-        "\"Ava's relatives co-own a small campground out there, so we can use their spot,\" Stacy added, her voice bubbling with excitement. \"Besides, the weather in Northvale is dropping fast. They said the Crimson Bloom [[phenomenon]] is happening tomorrow or the day after at the latest. This is an awesome chance to experience it out in actual nature!\"",
-        "Darren hesitated. Deep down, he didn't really love the idea of camping, but he had never traveled that far out into the woods with friends before. \"I... uh. I don't know...\"",
+        "\"Ava's [[relatives]] co-own a small campground out there, so we can use their spot,\" Stacy added, her voice bubbling with excitement. \"Besides, the weather in Northvale is dropping fast. They said the Crimson Bloom [[phenomenon]] is happening tomorrow or the day after at the latest. This is an awesome chance to experience it out in actual nature!\"",
+        "Darren [[hesitated]]. Deep down, he didn't really love the idea of camping, but he had never traveled that far out into the woods with friends before. \"I... uh. I don't know...\"",
         "\"We'd love to!\" Charlie suddenly cut in, stepping up beside him.",
-        "Noticing Darren's hesitation and knowing he was about to talk himself out of it, Charlie leaned in and bumped his shoulder, whispering [[urgently]] into his ear. \"Dude, the Crimson Sky is a once-a-year thing, and Northvale is the only place you can even see it. You gotta consider this.\"",
+        "Noticing Darren's hesitation and knowing he was about to [[talk himself out of it]], Charlie leaned in and bumped his shoulder, whispering [[urgently]] into his ear. \"Dude, the Crimson Sky is a once-a-year thing, and Northvale is the only place you can even see it. You gotta consider this.\"",
         "\"That'd be awesome,\" Stacy said quickly, looping her arm over Jenna's shoulder with a bright smile.",
         "\"And you?\" Jenna looked Darren straight in the eyes, waiting for his answer.",
-        "Darren's heart gave a sudden flutter under her gaze. He was still hesitant, but he knew he had to make a call fast.",
+        "Darren's [[heart gave a sudden flutter]] under her gaze. He was still hesitant, but he knew he had to [[make a call]] fast.",
         "\"Yeah, I'll go,\" Darren finally said, forcing a faint smile.",
         "\"Great! I'll text you the details later. See you then.\" Jenna offered a small, quiet smile before turning to walk down the crowded hallway with Stacy.",
-        "Charlie waited until the girls were well out of earshot before shifting into a teasing tone. \"Camping with girls? Oh, Darren. Camping... with girls. I mean, there's probably other guys going too, but dude...\"",
+        "Charlie waited until the girls were well out of [[earshot]] before shifting into a teasing tone. \"Camping with girls? Oh, Darren. Camping... with girls. I mean, there's probably other guys going too, but dude...\"",
         "He laughed softly, but Darren's expression didn't brighten up at all.",
-        "Charlie caught the look on his face and let out a light sigh. \"Come on, man, cheer up a little. Do you really just want to sit at home all weekend? Heading up to Northvale, camping in the mountains, watching the sky turn blood-red in the evening—plus hanging out with those two? What more could we ask for? People like them don't usually go out of their way to invite us.\"",
-        "\"I know, I know,\" Darren replied quickly, his voice still tight. He almost brought up the creepy Ravenwood legends he'd read online, but caught himself. He didn't want Charlie laughing at him for being [[paranoid]] over ghost stories.",
+        "Charlie caught the look on his face and let out a light sigh. \"Come on, man, cheer up a little. Do you really just want to sit at home all weekend? Heading up to Northvale, camping in the mountains, watching the sky turn blood-red in the evening—plus hanging out with those two? What more could we ask for? People like them don't usually [[go out of their way]] to invite us.\"",
+        "\"I know, I know,\" Darren replied quickly, his voice still tight. He almost brought up the creepy Ravenwood legends he'd read online, but [[caught himself]]. He didn't want Charlie laughing at him for being [[paranoid]] over ghost stories.",
         "\"It's just... people don't usually camp deep in the forest during the Crimson Sky anyway. The trees block most of the view. Most people just head to the lake in Northvale and rent a boat.\"",
         "Charlie tapped Darren's shoulder reassuringly, his tone softening. \"Darren…. It's gonna be fun.\"",
         "Later that night, Darren sat on the edge of his bed, pulling his phone from his pocket. A notification lit up his screen—a text from Jenna sent nine minutes ago:",
         "\"Darren, where are you? I'm so excited for tomorrow. We'll travel to Northvale separately but we'll meet you there. Meet me at the park checkpoint at 2:00 P.M. Cya! And don't change your mind.\"",
         "Ok. Darren quickly typed out his response. He was just about to hit send when a sudden noise cut through the quiet house.",
         "THUD. THUD.",
-        "A heavy rustle followed, [[accompanied]] by the panicked sound of wings beating against the air as a flock of birds burst into flight. It came from right outside his window.",
+        "A heavy rustle followed, [[accompanied]] by the panicked sound of wings beating against the air as a [[flock]] of birds burst into flight. It came from right outside his window.",
         "Could it be the neighbors? Darren wondered, pausing. He was home alone, so he was almost certainly sure it wasn't his parents.",
-        "Setting his phone on the mattress, Darren walked over to the glass and peered out into the night. A sharp draft [[seeped]] through the frame, brushing cold air against his face.",
+        "Setting his phone on the mattress, Darren walked over to the glass and peered out into the night. A sharp [[draft]] [[seeped]] through the frame, brushing cold air against his face.",
         "Outside, the backyard looked completely ordinary. Save for the pale moonlight filtering through the trees, the garden was draped in heavy shadows. The underground storage entrance near the back fence sat still, its heavy door shut tight. Darren let out a long yawn, rubbing his tired eyes.",
-        "Looking past the fence, he could see the neighbor's garage was dark and empty. They weren't even home. It was probably just the birds hitting a branch, he [[rationalized]]. It was late, and his exhausted mind was just jumping at shadows.",
+        "Looking past the fence, he could see the neighbor's garage was dark and empty. They weren't even home. It was probably just the birds hitting a branch, he [[rationalized]]. It was late, and his exhausted mind was just [[jumping at shadows]].",
         "Relieved, he walked back to his bed, picked up his phone, and finally hit send on the text to Jenna. He sat down, reaching out to switch off his room light, when a sharp noise shattered the quiet.",
         "CLANK.",
         "The distinct sound of breaking glass echoed up from the yard.",
         "Wait... what's... that sound? Darren's mind raced. It sounded exactly like glass breaking, but how and what caused it? In fact, the sound was way too loud for it to be from the neighbors. Ok, he wasn't entirely sure, it could still be from his neighbors, but they aren't even home.",
-        "Darren froze, a wave of ice washing down his spine as he thought. He snapped his head back toward the window. Birds didn't smash glass, so what did?",
-        "He obviously couldn't go check his neighbor's house, but in the direction of the sound, there was one more thing. His house's cellar. That's where his dad kept some valuable stuff. It was separated from the house that way.",
+        "Darren froze, [[a wave of ice washing down his spine]] as he thought. He snapped his head back toward the window. Birds didn't smash glass, so what did?",
+        "He obviously couldn't go check his neighbor's house, but in the direction of the sound, there was one more thing. His house's [[cellar]]. That's where his dad kept some valuable stuff. It was separated from the house that way.",
         "Darren sighed. This didn't necessarily mean there was an [[intruder]] in the house, but there could be something, or someone. It was worth checking.",
-        "Slipping his phone into his pocket, Darren reached down and grabbed the wooden baseball bat leaning against his desk, his fingers tightening around the grip as he stepped toward the door."
+        "Slipping his phone into his pocket, Darren reached down and grabbed the wooden baseball bat leaning against his desk, his fingers tightening around the [[grip]] as he stepped toward the door."
       ]
     },
     c2: {
       label:"Chapter 2", title:"The Intruder", note:"",
       end:"End of Chapter 2", back:"story", prev:"c1", next:null, nextSoon:"Chapter 3",
       paras:[
-        "Slowly, Darren pushed his bedroom door open. The stale air from downstairs drifted up to meet him. His heart hammered against his ribs, his knuckles turning white as he gripped the baseball bat tight.",
-        "The bottom of the staircase was swallowed in total darkness. Combined with the [[shattering]] glass he'd just heard, the dead silence of the first floor felt [[suffocating]].",
+        "Slowly, Darren pushed his bedroom door open. The stale air from downstairs drifted up to meet him. His heart [[hammered]] against his ribs, his knuckles turning white as he gripped the baseball bat tight.",
+        "The bottom of the staircase was swallowed in total darkness. Combined with the [[shattering]] glass he'd just heard, the [[dead silence]] of the first floor felt [[suffocating]].",
         "But the sound came from outside, he reminded himself. Whether it's an [[intruder]] or not, they're out in the yard, not in the house.",
         "Ok. Just check it. If there's nothing, just come back. Darren still didn't believe it was a good idea, but his courage took over.",
         "\"Hey!\" he called out into the dark.",
@@ -2282,20 +2346,20 @@ window.WYNNYX_REGISTRY = {
         "Darren let out a shaky sigh of relief. He flicked the wall switch, flooding the stairs with light. He looked down; it seemed clear. Whatever it was he heard was definitely not from inside the house anyway.",
         "He quickly hurried down to the first floor. Slowly, he set the baseball bat on the dining table and moved straight to the hall cabinet. Opening it, he reached inside and pulled out one of his dad's heavy golf clubs.",
         "There you are. He weighed the cold metal iron in his hands. This would do a much better job than a wooden bat, he thought.",
-        "He grabbed a flashlight off the table and gathered his courage. Soon, he crept toward the back door—the one leading out to the yard, right near the entrance to the underground storage room.",
-        "Darren let out a strained breath. What am I doing? he thought. Birds definitely couldn't smash glass, but one could definitely knock a glass bottle over. It might as well be nothing; he shouldn't worry. Darren sighed again.",
-        "His dad had told him to look after the house while he was away, and that was exactly what he was doing. He hesitated, his hand hovering nervously over the deadbolt.",
+        "He grabbed a [[flashlight]] off the table and gathered his courage. Soon, he crept toward the back door—the one leading out to the yard, right near the entrance to the underground storage room.",
+        "Darren let out a [[strained]] breath. What am I doing? he thought. Birds definitely couldn't smash glass, but one could definitely knock a glass bottle over. It might as well be nothing; he shouldn't worry. Darren sighed again.",
+        "His dad had told him to look after the house while he was away, and that was exactly what he was doing. He [[hesitated]], his hand hovering nervously over the [[deadbolt]].",
         "One. Two. Three.",
-        "He whispered the numbers into the empty room, and grabbed the back door handle tight. As he pulled it open, the hinges let out a long, whining creak. The freezing night air hit him immediately, biting through his clothes.",
+        "He whispered the numbers into the empty room, and grabbed the back door handle tight. As he pulled it open, the hinges let out a long, whining [[creak]]. The freezing night air hit him immediately, biting through his clothes.",
         "Gripping the heavy iron golf club tight, Darren stepped outside. He clicked on his flashlight, the bright beam piercing the dark yard and sweeping straight toward the entrance of the underground storage room. He let out a shaky breath and forced himself to keep moving.",
         "He walked through the biting cold and pale moonlight. It was dead quiet. At the far end of the backyard stood a small wooden structure, resembling a miniature shed. Its outline hunched against the dark.",
-        "It mainly served as an entrance to the underground storage room used for keeping old stuff. Most of his dad's things down there weren't all that valuable, but there were some sentimental memories and a few expensive old items.",
-        "Darren sighed in relief as he walked closer. The padlock was intact. Whatever that sound was, it hadn't come from around his house. He caught his breath again, feeling a wave of relief. He took a deep breath.",
+        "It mainly served as an entrance to the underground storage room used for keeping old stuff. Most of his dad's things down there weren't all that valuable, but there were some [[sentimental]] memories and a few expensive old items.",
+        "Darren sighed in relief as he walked closer. The [[padlock]] was intact. Whatever that sound was, it hadn't come from around his house. He caught his breath again, feeling a wave of relief. He took a deep breath.",
         "But as he was about to walk back, he noticed something behind the bush next to the structure.",
         "He caught it out of the corner of his eye—a little light from the flashlight reflecting off it. He was almost going to ignore it, but something inside him told him to look. Maybe it was just his instinct.",
         "Darren quickly stepped closer, pointing the flashlight down. His eyes widened as soon as he realized what it was. Glass. Shattered glass.",
         "His expression shifted immediately. It didn't take him long to process it; he turned his head to the left and realized the small window on the side of the structure was completely smashed in. Something—or someone—had broken it.",
-        "His heart slammed against his ribs, beating so loud he could hear it in his own ears. His legs suddenly felt like lead, refusing to move. The dread was way worse than what he'd felt before.",
+        "His heart slammed against his ribs, beating so loud he could hear it in his own ears. His legs suddenly [[felt like lead]], refusing to move. The dread was way worse than what he'd felt before.",
         "But he couldn't afford to panic now. If someone was actually down there, staying calm was his only chance. But… What should he do?",
         "He considered climbing in through the broken window, but the sharp edges of the shattered glass were too risky if he slipped. Making a split-second decision, he grabbed his keys and  rush to unlock the padlock on the door.",
         "Darren threw a quick glance over his shoulder to make sure the dark yard was empty, then he pushed the wooden door open. ",
@@ -2307,45 +2371,51 @@ window.WYNNYX_REGISTRY = {
         "He tried the light switch again, spamming the click, but it still wouldn't turn on. \"Oh, come on,\" he whispered. Darren started wondering if his golf club and flashlight were really going to save him.",
         "Darren stood still for a moment. This was the moment he actually hesitated. Whoever was down there could have a gun or other weapons; they might not have broken in empty-handed. But there was actually something down there he found valuable... something deep in his heart. His grandpa had made a lot of the things stored down there. It wasn't expensive stuff, but it was priceless in his heart.",
         "Taking a deep breath, Darren took a step closer to the stairs. His heart was beating faster than ever, his legs shaking. Darren began his descent. His sneakers bumped softly against the stairs as he forced himself down into the dark.",
-        "The beam of his flashlight swept across the cramped room. It was packed with towering cardboard boxes, metal shelves, old framed photos, forgotten toys, and a dusty, ancient sofa shoved into the corner. There were a million places to hide in the shadows.",
-        "Darren kept the light moving—left, right, up toward the rafters, and then down to the concrete floor.",
+        "The beam of his flashlight swept across the [[cramped]] room. It was packed with towering cardboard boxes, metal shelves, old framed photos, forgotten toys, and a dusty, ancient sofa shoved into the corner. There were a million places to hide in the shadows.",
+        "Darren kept the light moving—left, right, up toward the [[rafters]], and then down to the concrete floor.",
         "But there was nothing. He didn't see or hear anything out of place. Still, he couldn't stop worrying. The broken window upstairs was still proof that someone had broken in.",
-        "Darren's eyes began darting frantically around the dark room, sweeping the flashlight beam wildly into every shadow and corner, waiting for something to jump out.",
+        "Darren's eyes began darting [[frantically]] around the dark room, sweeping the flashlight beam wildly into every shadow and corner, waiting for something to jump out.",
         "But there was still nothing.",
-        "Darren moved forward, stepping cautiously across the dusty concrete floor. He entered a narrow aisle flanked by tall metal shelves on both sides. ",
-        "This was where his dad kept all the antiques—heavy ceramic mugs carved with drawings Darren had made with his grandpa, boxes of old toys his grandpa had bought him, and the last book his grandpa gave him before he died. Darren let out a quiet sigh. He really missed him. But thinking about that won't help him now. ",
-        "He looked ahead. At the end of the aisle, the path took a sharp left turn. That turn led straight to the old sofa tucked in the back corner. It was a blind spot. The perfect place for an ambush.",
+        "Darren moved forward, stepping cautiously across the dusty concrete floor. He entered a narrow [[aisle]] [[flanked]] by tall metal shelves on both sides. ",
+        "This was where his dad kept all the [[antiques]]—heavy [[ceramic]] mugs carved with drawings Darren had made with his grandpa, boxes of old toys his grandpa had bought him, and the last book his grandpa gave him before he died. Darren let out a quiet sigh. He really missed him. But thinking about that won't help him now. ",
+        "He looked ahead. At the end of the aisle, the path took a sharp left turn. That turn led straight to the old sofa tucked in the back corner. It was a [[blind spot]]. The perfect place for an [[ambush]].",
         "He adjusted his grip, holding the heavy golf club tightly in his right hand. ",
-        "Maybe I should've just stayed in bed, he thought, a spike of pure dread hitting his chest.",
+        "Maybe I should've just stayed in bed, he thought, a [[spike of pure dread]] hitting his chest.",
         "One. Two—",
         "He swung around the corner, snapping his flashlight beam directly into the shadows.",
         "Someone was indeed there. A figure dressed entirely in black, a mask covering their face and dark sunglasses hiding their eyes.",
-        "The intruder instantly lunged, hurling a heavy ceramic mug straight at his head. Darren ducked, barely dodging it as it smashed against the wall behind him. A piece of the shattered ceramic mug hit his back. \"Ugh.\" he grunted.",
+        "The [[intruder]] instantly [[lunged]], hurling a heavy ceramic mug straight at his head. Darren ducked, barely dodging it as it smashed against the wall behind him. A piece of the shattered ceramic mug hit his back. \"Ugh.\" he grunted.",
         "Darren acted fast. He stood back up, bracing himself to swing the iron golf club, but the intruder charged. They shoved him hard against the shelves, squeezing past him and sprinting straight for the stairs. Whatever they came for, they probably already had it.",
         "Pure reflex took over. Darren set his flashlight down on the shelf—its beam still shining straight down the narrow aisle—and grabbed a glass bottle, throwing it at the intruder with full force.",
         "It missed their back but shattered violently on the concrete floor right behind them. Sharp fragments of thick glass exploded outward, slicing directly into the back of the intruder's leg.",
         "The figure cried out, tripping over their own feet and crashing hard onto the cement, hands shooting out to break the fall. As they scrambled to look back, the beam of Darren's flashlight hit their head. In that split second, Darren realized something crucial. Long strands of hair had slipped out from beneath the black face covering.",
         "The figure cried out, tripping over their own feet and crashing hard onto the cement, hands shooting out to break the fall. As they scrambled to look back, the beam of Darren's flashlight hit their head. In that split second, Darren realized something crucial. Long strands of hair had slipped out from beneath the black face covering.",
         "This intruder wasn't a man. It was a woman. It all made sense now—the intruder's height was around 5'4 at most, and their build didn't look like a man's either. It was because.. she wasn't a man. Darren's expression shifted. ",
-        "The woman didn't waste a second. Recovering quickly, she slapped a small, folded piece of paper onto the floor, then scrambled up the stairs and bolted out into the dark yard.",
+        "The woman didn't waste a second. Recovering quickly, she slapped a small, folded piece of paper onto the floor, then [[scrambled]] up the stairs and bolted out into the dark yard.",
         "Darren immediately rushed forward to chase her, but stopped dead in his tracks. The glass he had just thrown was scattered entirely across the narrow path, blocking the exit. If he tried to run through it in the dark, it would tear right through his shoes.",
         "\"Shit!\" he screamed into the cold night air. \"What do you want?!\"",
         "But there was no reply. Just the chilling silence of the garden, leaving Darren entirely alone with his racing heart and the mysterious piece of paper left behind on the concrete.",
-        "\"Oh, man.\" Darren's racing heart slowly began to settle as he let out a long, shaky breath. Carefully avoiding the scattered shards of glass, he crouched down and picked up the folded piece of paper from the cold concrete.",
-        "He shone his flashlight over it. The bright beam illuminated a single, hastily written sentence scrawled across the page.",
+        "\"Oh, man.\" Darren's racing heart slowly began to settle as he let out a long, shaky breath. Carefully avoiding the scattered [[shards]] of glass, he [[crouched]] down and picked up the folded piece of paper from the cold concrete.",
+        "He shone his flashlight over it. The bright beam [[illuminated]] a single, [[hastily]] written sentence [[scrawled]] across the page.",
         "Tell your dad this belongs to me.",
         "It didn't really answer anything. If anything, it only left him with more questions.",
         "But Darren did have one solid guess: his dad's ex. The one from before his mom. She had actually broken into this exact storage room once when he was just a kid, taking something that she claimed rightfully belonged to her.",
-        "She hadn't worn a black mask or a tactical outfit back then, and she certainly hadn't left a [[cryptic]] note behind. Still, Darren had never really seen her face clearly, so it was a strong possibility. A mysterious woman breaking into their property just to steal a specific item and leave a bitter message for his dad? Who else could it be?",
+        "She hadn't worn a black mask or a [[tactical]] outfit back then, and she certainly hadn't left a [[cryptic]] note behind. Still, Darren had never really seen her face clearly, so it was a strong possibility. A mysterious woman breaking into their property just to steal a specific item and leave a bitter message for his dad? Who else could it be?",
         "Still, that didn't explain everything. A lot still didn't make sense, but he knew he could never guess the rest.",
         "\"Well,\" Darren muttered to the empty, freezing room, shaking his head. \"Glad he chose Mom.\""
       ]
     }
   };
   function esc(t){ return String(t).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  /* English levels: every tappable word has a "minimum level" (3 = Beginner only, 2 = Beginner + Intermediate, 1 = all levels incl. Advanced).
+     A word is underlined only when the reader's level (Beginner 3 / Intermediate 2 / Advanced 1) is at or above it. */
+  var WTIER = {"instinctively":2, "groggy":3, "shattering":3, "raspy":2, "suffocating":2, "fluorescent":2, "lingered":2, "corridor":3, "combination":3, "expansive":2, "terrain":2, "phenomenon":2, "urgently":2, "paranoid":2, "accompanied":2, "seeped":2, "rationalized":2, "intruder":3, "cryptic":2, "luminous":2, "cartographer":2, "ominous":2, "relentless":2, "cascade":2, "labyrinth":2, "ephemeral":1, "fumbling":3, "nightstand":3, "swig":3, "lantern":3, "rustling":3, "jolted":3, "relatives":3, "flock":3, "draft":3, "cellar":3, "flashlight":3, "hesitated":3, "grip":3, "aisle":3, "ambush":3, "antiques":3, "rafters":3, "scrambled":3, "padlock":3, "lunged":3, "shards":3, "crouched":3, "piercingly":2, "muffled":2, "reassuring":2, "vanishing without a trace":2, "tension":2, "drab":2, "draped":2, "hammered":2, "dead silence":2, "deadbolt":2, "creak":2, "sentimental":2, "frantically":2, "flanked":2, "cramped":2, "ceramic":2, "strained":2, "tactical":2, "hastily":2, "scrawled":2, "illuminated":2, "blind spot":2, "earshot":1, "go out of their way":1, "jumping at shadows":1, "a wave of ice washing down his spine":1, "heart gave a sudden flutter":1, "talk himself out of it":1, "make a call":1, "stood out against":1, "caught himself":1, "felt like lead":1, "spike of pure dread":1};
+  var WLEVELS = { beginner:3, intermediate:2, advanced:1 }, WLEVEL = 3, WLEVEL_ID = "beginner";
+  function wMin(key){ return WTIER[key] || 2; }
   function markup(str){
     return str.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,function(_,surf,key){
       key = key || surf;
+      if(WLEVEL < wMin(key)) return esc(surf);
       return '<button class="w" data-w="' + esc(key) + '">' + esc(surf) + '</button>';
     });
   }
@@ -2542,6 +2612,8 @@ window.WYNNYX_REGISTRY = {
   var READ_KEY  = "wynnyx.readmode.v1";
   var ASSIST_KEY = "wynnyx.assist.v1";
   var BOOKS_KEY = "wynnyx.books.v1";
+  var LEVEL_KEY = "wynnyx.level.v1";
+  (function(){ var id; try { id = JSON.parse(localStorage.getItem(LEVEL_KEY)); } catch(e){} if(WLEVELS[id]){ WLEVEL_ID = id; WLEVEL = WLEVELS[id]; } })();
 
   function load(key, fallback){
     try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -3228,6 +3300,7 @@ window.WYNNYX_REGISTRY = {
   /* ---------- Settings modal ---------- */
   var setScrim = $("setScrim"), setBtn = $("setBtn"), setOpen = false;
   function openSettings(){
+    syncLevelUI();
     loadFontCss();                                /* so the font previews in Settings render in their own faces */
     closeCard(); closePop(); closeHelp();
     setOpen = true;
@@ -3594,10 +3667,76 @@ window.WYNNYX_REGISTRY = {
     if(!assistOn) closeCard();
     if(rmode !== "scroll") updateFocus();
     if(persist !== false) save(ASSIST_KEY, assistOn);
+    if(typeof syncLevelUI === "function") syncLevelUI();
   }
   document.querySelectorAll(".assist-toggle").forEach(function(btn){
     btn.addEventListener("click", function(){ setAssist(!assistOn); });
   });
+
+  /* ---------- English level: Beginner / Intermediate / Advanced decide which words get underlined ---------- */
+  var LEVEL_OPTS = [
+    { id:"off", name:"No assistance", tag:"", desc:"Clean page. No underlined words.", bars:0 },
+    { id:"beginner", name:"Beginner (A1\u2013A2)", tag:"Most assistance", desc:"For readers who understand basic English but struggle with descriptive writing and unfamiliar vocabulary.", bars:3 },
+    { id:"intermediate", name:"Intermediate (B1\u2013B2)", tag:"Balanced", desc:"For readers who can comfortably read everyday English but may struggle with literary expressions, idioms, and less common vocabulary.", bars:2 },
+    { id:"advanced", name:"Advanced (C1\u2013C2)", tag:"Least assistance", desc:"For confident English readers who might appreciate explanations of nuanced expressions and figurative language.", bars:1 }
+  ];
+  function levelBars(n){
+    var h = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">';
+    for(var i = 0; i < 3; i++){ var x = 6 + i * 6; h += '<path d="M' + x + ' 19V' + (15 - i * 4) + '"' + (i < n ? '' : ' opacity=".3"') + '/>'; }
+    return h + '</svg>';
+  }
+  (function buildLevelList(){
+    var host = $("setLevelList"); if(!host) return;
+    LEVEL_OPTS.forEach(function(o){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "rm-btn"; b.setAttribute("role", "radio"); b.dataset.level = o.id; b.setAttribute("aria-checked", "false");
+      b.innerHTML = '<span class="ico">' + levelBars(o.bars) + '</span><span><b>' + o.name + '</b>' + (o.tag ? '<span class="lv-tag">' + o.tag + '</span>' : '') +
+        '<small>' + o.desc + '</small>' +
+        (o.id === "off" ? '' : '<small class="lv-ex"><span>Examples:</span> <i></i></small><small class="lv-n"><span>Underlined words in this chapter:</span> <em></em></small>');
+      b.addEventListener("click", function(){ setLevel(o.id); });
+      host.appendChild(b);
+    });
+  })();
+  function chapterWordKeys(cid){
+    var out = [], ch = CHAPTERS[cid]; if(!ch) return out;
+    ch.paras.forEach(function(t){ String(t).replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, function(_, a, k){ out.push(k || a); return ""; }); });
+    return out;
+  }
+  function syncLevelUI(){
+    var host = $("setLevelList"); if(!host) return;
+    var cid = CHAPTERS[curChap] ? curChap : "c1", keys = chapterWordKeys(cid);
+    host.querySelectorAll(".rm-btn").forEach(function(b){
+      var id = b.dataset.level, on = id === "off" ? !assistOn : (assistOn && id === WLEVEL_ID);
+      b.setAttribute("aria-checked", on ? "true" : "false");
+      if(id === "off") return;
+      var lv = WLEVELS[id], n = 0, ex = [], seen = {};
+      keys.forEach(function(k){
+        if(wMin(k) <= lv) n++;
+        if(wMin(k) === lv && !seen[k] && k.length <= 20 && !/^(stood out against|make a call|caught himself|combination|hesitated)$/.test(k) && ex.length < 4){ seen[k] = 1; ex.push(k.charAt(0).toUpperCase() + k.slice(1)); }
+      });
+      b.querySelector(".lv-ex i").textContent = ex.join(", ");
+      b.querySelector(".lv-n em").textContent = n;
+    });
+  }
+  function relevel(){
+    if(currentView !== "reader" || !CHAPTERS[curChap]) return;
+    var ch = CHAPTERS[curChap], ps = story.querySelectorAll("p");
+    if(ps.length !== ch.paras.length) return;
+    var a = captureAnchor(); closeCard();
+    for(var i = 0; i < ps.length; i++){ if(!ps[i].getAttribute("lang")) ps[i].innerHTML = markup(ch.paras[i]); }
+    setAssist(assistOn, false);
+    if(a) pendingResume = a;
+    schedulePaginate();
+  }
+  function setLevel(id){
+    if(id === "off"){ setAssist(false); return; }
+    if(!WLEVELS[id]) id = "beginner";
+    var changed = WLEVEL !== WLEVELS[id];
+    WLEVEL_ID = id; WLEVEL = WLEVELS[id]; save(LEVEL_KEY, id);
+    if(!assistOn) setAssist(true);
+    if(changed) relevel();
+    syncLevelUI();
+  }
 
   /* ---------- Saved words ---------- */
   var saved = load(STORE_KEY, []);
@@ -5277,6 +5416,11 @@ window.WYNNYX_REGISTRY = {
       "Scroll down the page, like a website.":"เลื่อนลงอ่านต่อเนื่อง เหมือนเว็บไซต์", "One page at a time. Tap the edges or use the arrow keys.":"ทีละหน้า แตะที่ขอบจอหรือใช้ปุ่มลูกศรเพื่อพลิกหน้า",
       "Two pages side by side with a 3D page turn and sound. Best on PC, tablet, or a phone turned sideways.":"สองหน้าเคียงกันพร้อมการพลิกหน้าแบบ 3 มิติและเสียงพลิกหน้า เหมาะกับคอมพิวเตอร์ แท็บเล็ต หรือโทรศัพท์แนวนอน", "Most immersive":"สมจริงที่สุด",
       "Tap for full screen":"แตะเพื่ออ่านเต็มจอ",
+      "Choose how much help you get with English words.":"เลือกว่าต้องการให้ช่วยเรื่องคำศัพท์ภาษาอังกฤษมากน้อยแค่ไหน", "No assistance":"ไม่ใช้ตัวช่วย", "Clean page. No underlined words.":"หน้าอ่านสะอาด ไม่มีคำขีดเส้นใต้",
+      "Beginner (A1\u2013A2)":"ระดับเริ่มต้น (A1\u2013A2)", "Most assistance":"ช่วยมากที่สุด", "For readers who understand basic English but struggle with descriptive writing and unfamiliar vocabulary.":"สำหรับผู้อ่านที่เข้าใจภาษาอังกฤษพื้นฐาน แต่ยังติดขัดกับงานเขียนเชิงบรรยายและคำศัพท์ที่ไม่คุ้นเคย",
+      "Intermediate (B1\u2013B2)":"ระดับกลาง (B1\u2013B2)", "Balanced":"สมดุล", "For readers who can comfortably read everyday English but may struggle with literary expressions, idioms, and less common vocabulary.":"สำหรับผู้ที่อ่านภาษาอังกฤษในชีวิตประจำวันได้สบาย แต่ยังติดกับสำนวนวรรณกรรม สำนวนเปรียบเทียบ และคำศัพท์ที่ไม่ค่อยพบ",
+      "Advanced (C1\u2013C2)":"ระดับสูง (C1\u2013C2)", "Least assistance":"ช่วยน้อยที่สุด", "For confident English readers who might appreciate explanations of nuanced expressions and figurative language.":"สำหรับผู้อ่านที่มั่นใจในภาษาอังกฤษ และอาจอยากได้คำอธิบายสำนวนที่ละเอียดอ่อนและภาษาเชิงเปรียบเทียบ",
+      "Examples:":"ตัวอย่าง:", "Underlined words in this chapter:":"คำที่ขีดเส้นใต้ในบทนี้:",
       /* discover */
       "Story-first reading":"อ่านเรื่องราวเป็นหลัก", "Original dark fantasy & sci-fi to":"นิยายแฟนตาซีมืดและไซไฟต้นฉบับ ให้คุณ", "get lost in":"หลงใหลไปกับมัน",
       "Discover":"ค้นหา", "Featured Story":"เรื่องเด่น", "Upcoming Story":"เรื่องที่กำลังจะมา",
